@@ -161,7 +161,7 @@ h1 {
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.04), 0 22px 60px rgba(0, 0, 0, 0.45);
   max-height: calc(100vh - 188px);
   min-height: 320px;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
   width: 100%;
 }
@@ -307,12 +307,14 @@ canvas {
 }
 
 .touch-controls {
-  bottom: 12px;
+  bottom: auto;
   display: none;
   gap: 12px;
   left: 50%;
   position: absolute;
+  top: calc(100% + 12px);
   transform: translateX(-50%);
+  z-index: 4;
 }
 
 .touch-controls button {
@@ -326,6 +328,7 @@ canvas {
   height: 54px;
   padding: 0;
   place-items: center;
+  touch-action: none;
   width: 54px;
 }
 
@@ -378,7 +381,8 @@ canvas {
 
   .stage-wrap {
     aspect-ratio: auto;
-    height: min(62vh, 520px);
+    height: min(58vh, 500px);
+    margin-bottom: 84px;
     max-height: none;
     min-height: 360px;
   }
@@ -393,6 +397,10 @@ canvas {
 }
 
 @media (hover: none) and (pointer: coarse) {
+  .stage-wrap {
+    margin-bottom: 84px;
+  }
+
   .touch-controls {
     display: flex;
   }
