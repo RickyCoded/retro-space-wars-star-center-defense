@@ -1,0 +1,399 @@
+:root {
+  color-scheme: dark;
+  --bg: #070912;
+  --panel: rgba(9, 14, 30, 0.82);
+  --line: rgba(105, 220, 255, 0.35);
+  --text: #f4fbff;
+  --muted: #94a9bc;
+  --cyan: #4de3ff;
+  --gold: #ffd166;
+  --danger: #ff4f78;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100%;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(75, 227, 255, 0.14), transparent 35%),
+    linear-gradient(180deg, #060714 0%, #10071b 58%, #060714 100%);
+  color: var(--text);
+  font-family: "Trebuchet MS", Arial, sans-serif;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+button {
+  border: 0;
+  color: #061019;
+  background: var(--gold);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 0 22px rgba(255, 209, 102, 0.34);
+}
+
+button:hover,
+button:focus-visible {
+  filter: brightness(1.08);
+  outline: 2px solid white;
+  outline-offset: 3px;
+}
+
+.game-shell {
+  width: min(100%, 1000px);
+}
+
+.game-header {
+  align-items: center;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: clamp(150px, 26vw, 260px) minmax(0, 1fr);
+  margin-bottom: 12px;
+}
+
+.brand {
+  align-items: center;
+  display: flex;
+  height: clamp(128px, 15vw, 156px);
+  justify-content: flex-start;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.brand-logo {
+  display: block;
+  filter: drop-shadow(0 0 12px rgba(77, 227, 255, 0.28)) drop-shadow(0 5px 12px rgba(0, 0, 0, 0.45));
+  height: auto;
+  left: 0;
+  max-width: 260px;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  user-select: none;
+  width: 100%;
+  -webkit-user-drag: none;
+}
+
+.header-controls {
+  align-items: flex-end;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-self: end;
+  width: min(100%, 540px);
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(1.15rem, 3vw, 1.8rem);
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.hud {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(4, minmax(74px, 1fr));
+  width: 100%;
+}
+
+.hud div {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  min-width: 74px;
+  padding: 8px 10px;
+  text-align: center;
+}
+
+.hud span {
+  color: var(--muted);
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.hud strong {
+  color: var(--cyan);
+  display: block;
+  font-size: 1.08rem;
+  line-height: 1.2;
+}
+
+.music-toggle {
+  background: rgba(77, 227, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 6px;
+  box-shadow: 0 0 18px rgba(77, 227, 255, 0.2);
+  color: #061019;
+  min-height: 42px;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
+.music-toggle[aria-pressed="true"] {
+  background: rgba(148, 169, 188, 0.92);
+  box-shadow: none;
+}
+
+.stage-wrap {
+  aspect-ratio: 3 / 2;
+  background: #050713;
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.04), 0 22px 60px rgba(0, 0, 0, 0.45);
+  max-height: calc(100vh - 188px);
+  min-height: 320px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+canvas {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.overlay {
+  align-items: center;
+  background: rgba(5, 7, 19, 0.72);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 18px;
+  position: absolute;
+  text-align: center;
+}
+
+.overlay-panel {
+  background: rgba(6, 11, 24, 0.92);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  max-width: 520px;
+  padding: clamp(20px, 5vw, 36px);
+}
+
+.kicker {
+  color: var(--cyan);
+  font-size: 0.82rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.overlay h2 {
+  font-size: clamp(1.6rem, 6vw, 3rem);
+  line-height: 1.02;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+
+.overlay p {
+  color: #c9d8e5;
+  line-height: 1.5;
+}
+
+.overlay button {
+  border-radius: 6px;
+  margin-top: 22px;
+  min-height: 46px;
+  padding: 0 22px;
+  text-transform: uppercase;
+}
+
+.victory-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.boss-health {
+  left: 50%;
+  max-width: 560px;
+  padding: 0 16px;
+  position: absolute;
+  top: 14px;
+  transform: translateX(-50%);
+  width: min(92%, 560px);
+  z-index: 2;
+}
+
+.boss-health-meta {
+  align-items: center;
+  color: var(--text);
+  display: flex;
+  font-size: 0.82rem;
+  font-weight: 900;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  text-transform: uppercase;
+}
+
+.boss-health-track {
+  background: rgba(6, 11, 24, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+  height: 14px;
+  overflow: hidden;
+}
+
+.boss-health-fill {
+  background: linear-gradient(90deg, #ff4f78, #ffd166);
+  box-shadow: 0 0 16px rgba(255, 79, 120, 0.55);
+  height: 100%;
+  transition: width 160ms linear;
+  width: 100%;
+}
+
+.boss-message {
+  color: var(--gold);
+  font-size: clamp(1.1rem, 4vw, 2.1rem);
+  font-weight: 900;
+  left: 50%;
+  letter-spacing: 0;
+  position: absolute;
+  text-align: center;
+  text-shadow: 0 0 18px rgba(255, 79, 120, 0.9), 0 3px 16px rgba(0, 0, 0, 0.9);
+  text-transform: uppercase;
+  top: 28%;
+  transform: translateX(-50%);
+  width: min(92%, 720px);
+  z-index: 3;
+}
+
+.controls-note {
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.84rem;
+  gap: 8px 16px;
+  justify-content: center;
+  margin-top: 18px;
+}
+
+.pause-badge {
+  background: rgba(6, 11, 24, 0.86);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--gold);
+  font-size: clamp(1.5rem, 5vw, 2.8rem);
+  font-weight: 900;
+  left: 50%;
+  padding: 12px 24px;
+  position: absolute;
+  text-transform: uppercase;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.touch-controls {
+  bottom: 12px;
+  display: none;
+  gap: 12px;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.touch-controls button {
+  align-items: center;
+  background: rgba(77, 227, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  color: #07111d;
+  display: grid;
+  font-size: 1.15rem;
+  height: 54px;
+  padding: 0;
+  place-items: center;
+  width: 54px;
+}
+
+.touch-controls #touchFire {
+  background: rgba(255, 209, 102, 0.9);
+  height: 62px;
+  width: 62px;
+}
+
+.hidden {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  body {
+    padding: 10px;
+  }
+
+  .game-header {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .brand {
+    height: clamp(104px, 32vw, 132px);
+    width: clamp(140px, 48vw, 220px);
+  }
+
+  .header-controls {
+    justify-self: stretch;
+    width: 100%;
+  }
+
+  .hud {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .music-toggle {
+    width: 100%;
+  }
+
+  .boss-health {
+    top: 10px;
+    width: 96%;
+  }
+
+  .boss-health-meta {
+    font-size: 0.7rem;
+  }
+
+  .stage-wrap {
+    aspect-ratio: auto;
+    height: min(62vh, 520px);
+    max-height: none;
+    min-height: 360px;
+  }
+
+  .touch-controls {
+    display: flex;
+  }
+
+  .controls-note {
+    display: none;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .touch-controls {
+    display: flex;
+  }
+}

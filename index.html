@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Retro Space Wars: Star Center Defense</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <section class="game-header" aria-label="Game status">
+        <div class="brand">
+          <!-- Logo source is set in game.js so it can be changed in one place. -->
+          <img id="brandLogo" class="brand-logo" alt="Retro Space Wars Arcade" draggable="false" />
+        </div>
+        <div class="header-controls">
+          <div class="hud">
+            <div><span>Score</span><strong id="score">0</strong></div>
+            <div><span>High Score</span><strong id="highScore">0</strong></div>
+            <div><span>Shield</span><strong id="health">100</strong></div>
+            <div><span>Wave</span><strong id="wave">1</strong></div>
+          </div>
+          <button id="musicToggle" class="music-toggle" type="button" aria-pressed="false">Music On</button>
+        </div>
+      </section>
+
+      <section class="stage-wrap">
+        <canvas id="gameCanvas" width="900" height="600" aria-label="Retro Space Wars game field"></canvas>
+
+        <div id="startScreen" class="overlay">
+          <div class="overlay-panel">
+            <p class="kicker">Alliance Command</p>
+            <h2>Retro Space Wars: Star Center Defense</h2>
+            <p>
+              Defend Star Center against the Void Empire. Move, fire, and survive each incoming wave.
+            </p>
+            <button id="startButton" type="button">Start Mission</button>
+            <div class="controls-note">
+              <span>Move: Arrow Keys or A/D</span>
+              <span>Shoot: Space</span>
+              <span>Pause: P</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="gameOverScreen" class="overlay hidden">
+          <div class="overlay-panel">
+            <p class="kicker">Mission Report</p>
+            <h2>Star Center Has Fallen</h2>
+            <p id="finalScore">Final score: 0</p>
+            <button id="restartButton" type="button">Restart Mission</button>
+          </div>
+        </div>
+
+        <div id="victoryScreen" class="overlay hidden">
+          <div class="overlay-panel">
+            <p class="kicker">Alliance Victory</p>
+            <h2>Star Center Defended</h2>
+            <p>The Void Empire fleet has been defeated.</p>
+            <p id="victoryScore">Final score: 0</p>
+            <p id="victoryHighScore">High score: 0</p>
+            <div class="victory-actions">
+              <button id="playAgainButton" type="button">Play Again</button>
+              <button id="returnTitleButton" type="button">Return to Title</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="bossHealthBar" class="boss-health hidden" aria-label="Boss status">
+          <div class="boss-health-meta">
+            <span id="bossName">Void Cruiser I</span>
+            <strong id="bossHealthPercent">100%</strong>
+          </div>
+          <div class="boss-health-track">
+            <div id="bossHealthFill" class="boss-health-fill"></div>
+          </div>
+        </div>
+
+        <div id="bossMessage" class="boss-message hidden">VOID EMPIRE CRUISER APPROACHING</div>
+
+        <div id="pauseScreen" class="pause-badge hidden">Paused</div>
+
+        <div class="touch-controls" aria-label="Touch controls">
+          <button id="touchLeft" type="button" aria-label="Move left">◀</button>
+          <button id="touchFire" type="button" aria-label="Fire">●</button>
+          <button id="touchRight" type="button" aria-label="Move right">▶</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>
