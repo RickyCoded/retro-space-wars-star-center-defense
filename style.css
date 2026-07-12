@@ -336,7 +336,7 @@ canvas {
   border-radius: 50%;
   color: #07111d;
   display: grid;
-  font-size: 1.15rem;
+  font-size: 0;
   height: 54px;
   padding: 0;
   place-items: center;
@@ -346,6 +346,27 @@ canvas {
   touch-action: none;
   user-select: none;
   width: 54px;
+}
+
+.touch-controls button::before {
+  color: #07111d;
+  display: block;
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.touch-controls #touchLeft::before {
+  content: "\2039";
+}
+
+.touch-controls #touchFire::before {
+  content: "\2022";
+  font-size: 2.4rem;
+}
+
+.touch-controls #touchRight::before {
+  content: "\203A";
 }
 
 .touch-controls #touchFire {
