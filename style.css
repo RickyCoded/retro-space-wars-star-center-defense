@@ -50,7 +50,7 @@ button:focus-visible {
 }
 
 .game-shell {
-  width: min(100%, 1000px);
+  width: min(100%, 900px);
 }
 
 .game-header {
@@ -387,6 +387,10 @@ canvas {
   .game-header {
     align-items: stretch;
     grid-template-columns: 1fr;
+  }
+
+  .game-shell {
+    width: 100%;
   }
 
   .brand {
