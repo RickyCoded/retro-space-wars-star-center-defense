@@ -422,6 +422,7 @@ function resetGame() {
     permanentChrono: false,
     dualMissile: false,
     dualMissileShotCount: 0,
+    dualMissileMissileUpgrade: false,
   };
   bullets = [];
   enemyBullets = [];
@@ -635,7 +636,7 @@ function shootPlayer() {
            { xOffset: 11, vx: 38, color: "#8df7ff" },
          ]
     : [{ xOffset: 0, vx: 0 }];
-  if (isDualMissileShot && player.dualMissileShotCount % 4 === 0) {
+  if (isDualMissileShot && player.dualMissileMissileUpgrade && player.dualMissileShotCount % 4 === 0) {
     shots.push({
       xOffset: 0,
       vx: 0,
@@ -669,7 +670,7 @@ function spawnPowerUp(x, y, type = "chrono") {
     type,
     x,
     y,
-    radius: type === "dualMissile" ? 17 : 15,
+    radius: type === "dualMissile" || type === "dualMissilePlus" ? 17 : 15,
     speed: 95,
     spin: Math.random() * Math.PI * 2,
     drift: Math.random() > 0.5 ? 24 : -24,
@@ -678,8 +679,11 @@ function spawnPowerUp(x, y, type = "chrono") {
 
 function collectPowerUp(powerUp) {
   powerUp.collected = true;
-  if (powerUp.type === "dualMissile") {
+  if (powerUp.type === "dualMissile" || powerUp.type === "dualMissilePlus") {
     player.dualMissile = true;
+    if (powerUp.type === "dualMissilePlus") {
+      player.dualMissileMissileUpgrade = true;
+    }
     player.dualMissileShotCount = 0;
     addExplosion(powerUp.x, powerUp.y, "#ffd166");
     playTone(620, 0.18, "square", 0.04);
@@ -916,7 +920,8 @@ function defeatBoss() {
   playTone(70, 0.35, "sawtooth", 0.045);
 
   if (boss.number !== 5) {
-    spawnPowerUp(boss.x, boss.y + boss.height * 0.25, "dualMissile");
+    const rewardType = boss.number === 2 ? "dualMissilePlus" : "dualMissile";
+    spawnPowerUp(boss.x, boss.y + boss.height * 0.25, rewardType);
   }
 
 }
@@ -1367,7 +1372,7 @@ function drawPowerUp(powerUp) {
   ctx.translate(powerUp.x, powerUp.y);
   ctx.rotate(powerUp.spin * 0.65);
 
-  if (powerUp.type === "dualMissile") {
+  if (powerUp.type === "dualMissile" || powerUp.type === "dualMissilePlus") {
     drawDualMissilePowerUpFallback();
   } else if (!drawShipImage(shipImages.powerUp, 0, 0, 34, 34)) {
     drawPowerUpFallback();
