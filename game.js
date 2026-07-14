@@ -579,16 +579,25 @@ function playWaveCompleteChime() {
     return;
   }
 
-  [
-    { frequency: 660, delay: 0 },
-    { frequency: 880, delay: 90 },
-    { frequency: 1175, delay: 180 },
-  ].forEach((note) => {
-    setTimeout(() => {
-      if (gameState === "playing" && !paused) {
-        playTone(note.frequency, 0.12, "triangle", 0.04);
-      }
-    }, note.delay);
+  if (paused) {
+    return;
+  }
+
+  const bell = audioContext.createGain();
+  const now = audioContext.currentTime;
+  bell.gain.setValueAtTime(0.001, now);
+  bell.gain.exponentialRampToValueAtTime(0.11 * SOUND_EFFECT_VOLUME, now + 0.015);
+  bell.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
+  bell.connect(audioContext.destination);
+
+  [1046, 1568].forEach((frequency) => {
+    const oscillator = audioContext.createOscillator();
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(frequency, now);
+    oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.985, now + 0.85);
+    oscillator.connect(bell);
+    oscillator.start(now);
+    oscillator.stop(now + 0.9);
   });
 }
 
