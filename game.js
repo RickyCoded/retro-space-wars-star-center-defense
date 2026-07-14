@@ -455,6 +455,38 @@ function waveSize() {
   return 7 + wave * 3;
 }
 
+function enemySpeedRange() {
+  const speedTargets = [
+    { wave: 5, min: 118, max: 135 },
+    { wave: 10, min: 135, max: 170 },
+    { wave: 20, min: 170, max: 200 },
+    { wave: 24, min: 200, max: 235 },
+  ];
+
+  if (wave < speedTargets[0].wave) {
+    return {
+      min: 70 + wave * 13,
+      max: 105 + wave * 13,
+    };
+  }
+
+  for (let i = 0; i < speedTargets.length - 1; i += 1) {
+    const current = speedTargets[i];
+    const next = speedTargets[i + 1];
+
+    if (wave <= next.wave) {
+      const progress = (wave - current.wave) / (next.wave - current.wave);
+
+      return {
+        min: current.min + (next.min - current.min) * progress,
+        max: current.max + (next.max - current.max) * progress,
+      };
+    }
+  }
+
+  return speedTargets[speedTargets.length - 1];
+}
+
 function updateHud() {
   if (score > highScore) {
     highScore = score;
@@ -560,12 +592,13 @@ function spawnEnemy() {
   const isHeavy = wave > 2 && typeRoll > 0.78;
   const isShooter = wave > 1 && !isHeavy && typeRoll > 0.54;
   const spriteKey = isHeavy ? "boss" : isShooter ? "enemy2" : "enemy1";
+  const speedRange = enemySpeedRange();
 
   enemies.push({
     x: sidePadding + Math.random() * (width() - sidePadding * 2),
     y: -35,
     radius: isHeavy ? 24 : 18,
-    speed: 70 + wave * 13 + Math.random() * 35,
+    speed: speedRange.min + Math.random() * (speedRange.max - speedRange.min),
     health: isHeavy ? 3 : isShooter ? 2 : 1,
     maxHealth: isHeavy ? 3 : isShooter ? 2 : 1,
     points: isHeavy ? 70 : isShooter ? 45 : 30,
