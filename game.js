@@ -39,6 +39,7 @@ const MUSIC_VOLUME = {
 };
 
 const MUSIC_FADE_MS = 450;
+const SOUND_EFFECT_VOLUME = 1.75;
 
 const keys = {
   left: false,
@@ -565,7 +566,7 @@ function playTone(frequency, duration, type = "square", gain = 0.035) {
   const volume = audioContext.createGain();
   oscillator.type = type;
   oscillator.frequency.value = frequency;
-  volume.gain.value = gain;
+  volume.gain.value = gain * SOUND_EFFECT_VOLUME;
   volume.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
   oscillator.connect(volume);
   volume.connect(audioContext.destination);
@@ -585,7 +586,7 @@ function playWaveCompleteChime() {
   ].forEach((note) => {
     setTimeout(() => {
       if (gameState === "playing" && !paused) {
-        playTone(note.frequency, 0.12, "triangle", 0.03);
+        playTone(note.frequency, 0.12, "triangle", 0.04);
       }
     }, note.delay);
   });
