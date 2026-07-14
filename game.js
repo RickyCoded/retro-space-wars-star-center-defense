@@ -415,7 +415,7 @@ function resetGame() {
     x: width() / 2,
     y: height() - 70,
     radius: 18,
-    speed: 430,
+    speed: 380,
     health: 100,
     invulnerable: 0,
     spreadTimer: 0,
