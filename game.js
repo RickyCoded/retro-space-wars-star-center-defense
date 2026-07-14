@@ -421,6 +421,7 @@ function resetGame() {
     spreadTimer: 0,
     permanentChrono: false,
     dualMissile: false,
+    dualMissileShotCount: 0,
   };
   bullets = [];
   enemyBullets = [];
@@ -617,6 +618,11 @@ function shootPlayer() {
   }
 
   const hasSpreadFire = player.spreadTimer > 0 || player.permanentChrono;
+  const isDualMissileShot = player.dualMissile && !hasSpreadFire;
+  if (isDualMissileShot) {
+    player.dualMissileShotCount += 1;
+  }
+
   const shots = hasSpreadFire
     ? [
         { xOffset: -9, vx: -175 },
@@ -626,18 +632,31 @@ function shootPlayer() {
     : player.dualMissile
       ? [
           { xOffset: -11, vx: -38, color: "#8df7ff" },
-          { xOffset: 11, vx: 38, color: "#8df7ff" },
-        ]
+           { xOffset: 11, vx: 38, color: "#8df7ff" },
+         ]
     : [{ xOffset: 0, vx: 0 }];
+  if (isDualMissileShot && player.dualMissileShotCount % 4 === 0) {
+    shots.push({
+      xOffset: 0,
+      vx: 0,
+      color: "#ff4f78",
+      damage: 2,
+      missile: true,
+      radius: 8,
+      speed: 590,
+    });
+  }
 
   shots.forEach((shot) => {
     bullets.push({
       x: player.x + shot.xOffset,
       y: player.y - 20,
-      radius: player.dualMissile && !hasSpreadFire ? 5 : 4,
-      speed: 520,
+      radius: shot.radius || (isDualMissileShot ? 5 : 4),
+      speed: shot.speed || 520,
       vx: shot.vx,
       color: shot.color || "#ffd166",
+      damage: shot.damage || 1,
+      missile: shot.missile || false,
     });
   });
 
@@ -661,6 +680,7 @@ function collectPowerUp(powerUp) {
   powerUp.collected = true;
   if (powerUp.type === "dualMissile") {
     player.dualMissile = true;
+    player.dualMissileShotCount = 0;
     addExplosion(powerUp.x, powerUp.y, "#ffd166");
     playTone(620, 0.18, "square", 0.04);
     return;
@@ -896,8 +916,7 @@ function defeatBoss() {
   playTone(70, 0.35, "sawtooth", 0.045);
 
   if (boss.number !== 5) {
-    const rewardType = boss.number === 2 ? "permanentChrono" : "dualMissile";
-    spawnPowerUp(boss.x, boss.y + boss.height * 0.25, rewardType);
+    spawnPowerUp(boss.x, boss.y + boss.height * 0.25, "dualMissile");
   }
 
 }
@@ -1031,7 +1050,7 @@ function checkCollisions() {
 
       if (distance(bullet, enemy) < bullet.radius + enemy.radius) {
         bullet.y = -100;
-        enemy.health -= 1;
+        enemy.health -= bullet.damage || 1;
         addExplosion(bullet.x, bullet.y, enemy.accent);
         if (enemy.health <= 0) {
           score += enemy.points;
@@ -1044,7 +1063,7 @@ function checkCollisions() {
 
     if (boss && bossMode === "active" && distance(bullet, boss) < bullet.radius + boss.radius) {
       bullet.y = -100;
-      damageBoss(10);
+      damageBoss(bullet.missile ? 18 : 10);
       addExplosion(bullet.x, bullet.y, "#ff4f78");
     }
   });
@@ -1424,9 +1443,19 @@ function drawImageContain(asset, x, y, maxWidth, maxHeight) {
 
 function drawPlayerBullet(bullet) {
   ctx.fillStyle = bullet.color || "#ffd166";
-  ctx.shadowBlur = 12;
+  ctx.shadowBlur = bullet.missile ? 18 : 12;
   ctx.shadowColor = bullet.color || "#ffd166";
-  ctx.fillRect(bullet.x - bullet.radius / 2, bullet.y - 12, bullet.radius, 18);
+  if (bullet.missile) {
+    ctx.beginPath();
+    ctx.moveTo(bullet.x, bullet.y - 16);
+    ctx.lineTo(bullet.x + bullet.radius, bullet.y + 10);
+    ctx.lineTo(bullet.x, bullet.y + 18);
+    ctx.lineTo(bullet.x - bullet.radius, bullet.y + 10);
+    ctx.closePath();
+    ctx.fill();
+  } else {
+    ctx.fillRect(bullet.x - bullet.radius / 2, bullet.y - 12, bullet.radius, 18);
+  }
   ctx.shadowBlur = 0;
 }
 
