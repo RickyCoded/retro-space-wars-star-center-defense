@@ -150,6 +150,7 @@ let particles = [];
 let score = 0;
 let highScore = loadHighScore();
 let wave = 1;
+let backgroundMode = "normal";
 let enemiesRemaining = 0;
 let spawnTimer = 0;
 let powerUpsDroppedThisWave = 0;
@@ -439,6 +440,7 @@ function resetGame() {
   particles = [];
   score = 0;
   wave = 1;
+  backgroundMode = "normal";
   enemiesRemaining = waveSize();
   spawnTimer = 0.4;
   powerUpsDroppedThisWave = 0;
@@ -930,6 +932,9 @@ function defeatBoss() {
   if (boss.number === 1) {
     firstBossDefeated = true;
   }
+  if (boss.number === 3) {
+    backgroundMode = "fire";
+  }
   score += boss.scoreValue;
   updateHud();
   addExplosion(boss.x, boss.y, "#ff4f78");
@@ -1253,11 +1258,27 @@ function draw() {
   ctx.clearRect(0, 0, stageWidth, stageHeight);
 
   const spaceGradient = ctx.createLinearGradient(0, 0, 0, stageHeight);
-  spaceGradient.addColorStop(0, "#050714");
-  spaceGradient.addColorStop(0.55, "#10091f");
-  spaceGradient.addColorStop(1, "#04050c");
+  if (backgroundMode === "fire" && gameState !== "start") {
+    spaceGradient.addColorStop(0, "#18040a");
+    spaceGradient.addColorStop(0.42, "#3a0711");
+    spaceGradient.addColorStop(0.78, "#17030a");
+    spaceGradient.addColorStop(1, "#050308");
+  } else {
+    spaceGradient.addColorStop(0, "#050714");
+    spaceGradient.addColorStop(0.55, "#10091f");
+    spaceGradient.addColorStop(1, "#04050c");
+  }
   ctx.fillStyle = spaceGradient;
   ctx.fillRect(0, 0, stageWidth, stageHeight);
+
+  if (backgroundMode === "fire" && gameState !== "start") {
+    const fireGlow = ctx.createRadialGradient(stageWidth * 0.5, stageHeight * 0.95, 20, stageWidth * 0.5, stageHeight * 0.95, stageWidth * 0.75);
+    fireGlow.addColorStop(0, "rgba(255, 79, 40, 0.26)");
+    fireGlow.addColorStop(0.45, "rgba(255, 33, 76, 0.12)");
+    fireGlow.addColorStop(1, "rgba(255, 33, 76, 0)");
+    ctx.fillStyle = fireGlow;
+    ctx.fillRect(0, 0, stageWidth, stageHeight);
+  }
 
   drawStars();
   drawPlayer();
@@ -1276,7 +1297,7 @@ function draw() {
 function drawStars() {
   stars.forEach((star) => {
     ctx.globalAlpha = star.alpha;
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = backgroundMode === "fire" && gameState !== "start" ? "#ffd6c7" : "#ffffff";
     ctx.fillRect(star.x, star.y, star.size, star.size);
   });
   ctx.globalAlpha = 1;
