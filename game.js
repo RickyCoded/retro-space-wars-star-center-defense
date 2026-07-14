@@ -579,10 +579,6 @@ function playWaveCompleteChime() {
     return;
   }
 
-  if (paused) {
-    return;
-  }
-
   const bell = audioContext.createGain();
   const now = audioContext.currentTime;
   bell.gain.setValueAtTime(0.001, now);
