@@ -419,6 +419,7 @@ function resetGame() {
     health: 100,
     invulnerable: 0,
     spreadTimer: 0,
+    permanentChrono: false,
     dualMissile: false,
   };
   bullets = [];
@@ -615,7 +616,8 @@ function shootPlayer() {
     return;
   }
 
-  const shots = player.spreadTimer > 0
+  const hasSpreadFire = player.spreadTimer > 0 || player.permanentChrono;
+  const shots = hasSpreadFire
     ? [
         { xOffset: -9, vx: -175 },
         { xOffset: 0, vx: 0 },
@@ -632,15 +634,15 @@ function shootPlayer() {
     bullets.push({
       x: player.x + shot.xOffset,
       y: player.y - 20,
-      radius: player.dualMissile && player.spreadTimer <= 0 ? 5 : 4,
+      radius: player.dualMissile && !hasSpreadFire ? 5 : 4,
       speed: 520,
       vx: shot.vx,
       color: shot.color || "#ffd166",
     });
   });
 
-  fireCooldown = player.spreadTimer > 0 || player.dualMissile ? 0.14 : 0.18;
-  playTone(player.spreadTimer > 0 ? 900 : 760, 0.06, "square", 0.025);
+  fireCooldown = hasSpreadFire || player.dualMissile ? 0.14 : 0.18;
+  playTone(hasSpreadFire ? 900 : 760, 0.06, "square", 0.025);
 }
 
 function spawnPowerUp(x, y, type = "chrono") {
@@ -661,6 +663,14 @@ function collectPowerUp(powerUp) {
     player.dualMissile = true;
     addExplosion(powerUp.x, powerUp.y, "#ffd166");
     playTone(620, 0.18, "square", 0.04);
+    return;
+  }
+
+  if (powerUp.type === "permanentChrono") {
+    player.permanentChrono = true;
+    player.spreadTimer = 0;
+    addExplosion(powerUp.x, powerUp.y, "#8df7ff");
+    playTone(1120, 0.22, "triangle", 0.045);
     return;
   }
 
@@ -886,7 +896,8 @@ function defeatBoss() {
   playTone(70, 0.35, "sawtooth", 0.045);
 
   if (boss.number !== 5) {
-    spawnPowerUp(boss.x, boss.y + boss.height * 0.25, "dualMissile");
+    const rewardType = boss.number === 2 ? "permanentChrono" : "dualMissile";
+    spawnPowerUp(boss.x, boss.y + boss.height * 0.25, rewardType);
   }
 
 }
