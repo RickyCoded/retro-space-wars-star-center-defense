@@ -573,6 +573,24 @@ function playTone(frequency, duration, type = "square", gain = 0.035) {
   oscillator.stop(audioContext.currentTime + duration);
 }
 
+function playWaveCompleteChime() {
+  if (!audioContext || gameState !== "playing") {
+    return;
+  }
+
+  [
+    { frequency: 660, delay: 0 },
+    { frequency: 880, delay: 90 },
+    { frequency: 1175, delay: 180 },
+  ].forEach((note) => {
+    setTimeout(() => {
+      if (gameState === "playing" && !paused) {
+        playTone(note.frequency, 0.12, "triangle", 0.03);
+      }
+    }, note.delay);
+  });
+}
+
 function unlockAudio() {
   // Browsers require a real user gesture before music can play.
   musicUnlocked = true;
@@ -755,6 +773,7 @@ function startNextWave() {
   wave += 1;
   powerUpsDroppedThisWave = 0;
   player.health = Math.min(100, player.health + 12);
+  playWaveCompleteChime();
 
   if (isBossWave(wave)) {
     startBossWave();
