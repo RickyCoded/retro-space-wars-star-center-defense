@@ -380,22 +380,38 @@ canvas {
 }
 
 @media (max-width: 720px) {
+  html,
   body {
-    padding: 10px;
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  body {
+    padding: 8px;
+    place-items: stretch;
+    touch-action: none;
   }
 
   .game-header {
     align-items: stretch;
+    gap: 8px;
     grid-template-columns: 1fr;
+    margin-bottom: 8px;
   }
 
   .game-shell {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    height: calc(100dvh - 16px);
+    min-height: 0;
     width: 100%;
   }
 
   .brand {
-    height: clamp(104px, 32vw, 132px);
-    width: clamp(140px, 48vw, 220px);
+    height: clamp(70px, 22vw, 96px);
+    width: clamp(120px, 42vw, 190px);
   }
 
   .header-controls {
@@ -422,10 +438,10 @@ canvas {
 
   .stage-wrap {
     aspect-ratio: auto;
-    height: min(58vh, 500px);
+    height: auto;
     margin-bottom: 84px;
     max-height: none;
-    min-height: 360px;
+    min-height: 0;
   }
 
   .touch-controls {
