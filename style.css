@@ -18,6 +18,9 @@ html,
 body {
   height: 100%;
   margin: 0;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
 body {
@@ -30,6 +33,7 @@ body {
   display: grid;
   place-items: center;
   padding: 16px;
+  touch-action: manipulation;
 }
 
 button {
@@ -50,6 +54,10 @@ button:focus-visible {
 }
 
 .game-shell {
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
   width: min(100%, 900px);
 }
 
