@@ -71,7 +71,7 @@ button:focus-visible {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
-  width: min(100%, 520px);
+  width: min(100%, 480px);
 }
 
 .game-header {
@@ -175,7 +175,7 @@ h1 {
 }
 
 .stage-wrap {
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 9 / 14;
   background: #050713;
   border: 2px solid var(--line);
   border-radius: 8px;
