@@ -478,6 +478,18 @@ canvas {
   }
 }
 
+@media (min-width: 721px) {
+  body {
+    background:
+      linear-gradient(rgba(4, 6, 16, 0.18), rgba(4, 6, 16, 0.48)),
+      url("assets/images/desktop-backdrop.png") center / cover no-repeat fixed;
+  }
+
+  .game-shell {
+    filter: drop-shadow(0 0 28px rgba(0, 0, 0, 0.68));
+  }
+}
+
 @media (hover: none) and (pointer: coarse) {
   .stage-wrap {
     margin-bottom: 84px;
