@@ -175,13 +175,14 @@ h1 {
 }
 
 .stage-wrap {
-  aspect-ratio: 9 / 14;
+  aspect-ratio: auto;
   background: #050713;
   border: 2px solid var(--line);
   border-radius: 8px;
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.04), 0 22px 60px rgba(0, 0, 0, 0.45);
-  max-height: calc(100vh - 188px);
-  min-height: 320px;
+  height: min(76vh, 760px);
+  max-height: none;
+  min-height: 560px;
   overflow: visible;
   position: relative;
   -webkit-tap-highlight-color: transparent;
