@@ -1134,9 +1134,9 @@ function distance(a, b) {
 }
 
 function maybeDropPowerUp(enemy) {
-  const maxPowerUpsPerWave = firstBossDefeated ? 5 : 3;
-  const dropChance = enemy.isBossShip ? 0.55 : 0.18;
-  const canDrop = enemy.isBossShip || firstBossDefeated;
+  const maxPowerUpsPerWave = 3;
+  const dropChance = 0.55;
+  const canDrop = enemy.isBossShip;
 
   if (canDrop && powerUpsDroppedThisWave < maxPowerUpsPerWave && Math.random() < dropChance) {
     spawnPowerUp(enemy.x, enemy.y);
