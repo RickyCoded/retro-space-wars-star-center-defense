@@ -30,7 +30,10 @@ brandLogo.src = LOGO_IMAGE_SRC;
 
 const MUSIC_FILES = {
   title: "assets/audio/title-theme.mp3",
-  gameplay: "assets/audio/gameplay-theme.mp3",
+  gameplay: [
+    "assets/audio/gameplay-theme.mp3",
+    "assets/audio/gameplay-theme-2.mp3",
+  ],
 };
 
 const MUSIC_VOLUME = {
@@ -163,10 +166,11 @@ let musicUnlocked = false;
 let musicMuted = false;
 let currentMusic = null;
 let musicRequestId = 0;
+let gameplayMusicIndex = 0;
 
 const musicTracks = {
   title: createMusicTrack(MUSIC_FILES.title, MUSIC_VOLUME.title),
-  gameplay: createMusicTrack(MUSIC_FILES.gameplay, MUSIC_VOLUME.gameplay),
+  gameplay: createMusicTrack(MUSIC_FILES.gameplay[gameplayMusicIndex], MUSIC_VOLUME.gameplay),
 };
 
 function loadShipImage(src) {
@@ -202,11 +206,52 @@ function createMusicTrack(src, volume) {
 
   audio.addEventListener("error", () => {
     track.failed = true;
-    console.warn(`Music file could not be loaded: ${src}`);
+    console.warn(`Music file could not be loaded: ${track.src}`);
   });
 
   return track;
 }
+
+function getGameplayMusicSrc() {
+  return MUSIC_FILES.gameplay[gameplayMusicIndex] || MUSIC_FILES.gameplay[0];
+}
+
+function resetGameplayMusicPlaylist() {
+  gameplayMusicIndex = 0;
+  const track = musicTracks.gameplay;
+  const firstTrackSrc = getGameplayMusicSrc();
+
+  if (track.audio.src.endsWith(firstTrackSrc)) {
+    track.failed = false;
+    return;
+  }
+
+  track.src = firstTrackSrc;
+  track.failed = false;
+  track.audio.src = firstTrackSrc;
+  track.audio.load();
+}
+
+function advanceGameplayMusicPlaylist() {
+  if (currentMusic !== "gameplay" || musicMuted || MUSIC_FILES.gameplay.length < 2) {
+    return;
+  }
+
+  gameplayMusicIndex = (gameplayMusicIndex + 1) % MUSIC_FILES.gameplay.length;
+  const track = musicTracks.gameplay;
+  track.src = getGameplayMusicSrc();
+  track.failed = false;
+  track.audio.src = track.src;
+  track.audio.load();
+  beginMusic("gameplay");
+}
+
+musicTracks.gameplay.audio.addEventListener("ended", advanceGameplayMusicPlaylist);
+musicTracks.gameplay.audio.addEventListener("error", () => {
+  if (currentMusic === "gameplay" && MUSIC_FILES.gameplay.length > 1) {
+    advanceGameplayMusicPlaylist();
+  }
+});
 
 function loadHighScore() {
   try {
@@ -273,7 +318,7 @@ function beginMusic(trackName) {
   currentMusic = trackName;
   musicRequestId += 1;
   const requestId = musicRequestId;
-  track.audio.loop = true;
+  track.audio.loop = trackName !== "gameplay" || MUSIC_FILES.gameplay.length < 2;
   track.audio.volume = 0;
 
   track.audio.play()
@@ -299,6 +344,9 @@ function stopMusic(trackName, clearCurrent = true, onComplete, resetTime = true)
   musicRequestId += 1;
 
   if (!track || track.audio.paused) {
+    if (trackName === "gameplay" && resetTime) {
+      resetGameplayMusicPlaylist();
+    }
     if (clearCurrent && currentMusic === trackName) {
       currentMusic = null;
     }
@@ -310,6 +358,9 @@ function stopMusic(trackName, clearCurrent = true, onComplete, resetTime = true)
     track.audio.pause();
     if (resetTime) {
       track.audio.currentTime = 0;
+      if (trackName === "gameplay") {
+        resetGameplayMusicPlaylist();
+      }
     }
     if (clearCurrent && currentMusic === trackName) {
       currentMusic = null;

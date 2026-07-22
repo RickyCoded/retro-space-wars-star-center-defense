@@ -106,7 +106,7 @@ Available boss attack pattern names are:
 
 ## Adding Music
 
-Place the two looping MP3 files in:
+Place the music MP3 files in:
 
 ```text
 assets/audio/
@@ -115,9 +115,10 @@ assets/audio/
 Use these exact file names:
 
 - `title-theme.mp3` - title-screen music
-- `gameplay-theme.mp3` - gameplay music
+- `gameplay-theme.mp3` - first gameplay music track
+- `gameplay-theme-2.mp3` - second gameplay music track, played after the first one ends
 
-To replace the songs, overwrite those files with new MP3s using the same names. To change the filenames later, edit the `MUSIC_FILES` values near the top of `game.js`.
+During gameplay, the first track plays, then the second track plays, then the playlist repeats. To replace the songs, overwrite those files with new MP3s using the same names. To change the filenames later, edit the `MUSIC_FILES` values near the top of `game.js`.
 
 To change music volume, edit the `MUSIC_VOLUME` values near the top of `game.js`:
 
