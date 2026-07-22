@@ -31,6 +31,7 @@ brandLogo.src = LOGO_IMAGE_SRC;
 
 const MUSIC_FILES = {
   title: "assets/audio/title-theme.mp3",
+  gameOver: "assets/audio/game-over-theme.mp3",
   gameplay: [
     "assets/audio/gameplay-theme.mp3",
     "assets/audio/gameplay-theme-2.mp3",
@@ -41,6 +42,7 @@ const MUSIC_FILES = {
 const MUSIC_VOLUME = {
   title: 0.45,
   gameplay: 0.35,
+  gameOver: 0.4,
 };
 
 const MUSIC_FADE_MS = 450;
@@ -173,6 +175,7 @@ let mobileAutoFireEnabled = false;
 
 const musicTracks = {
   title: createMusicTrack(MUSIC_FILES.title, MUSIC_VOLUME.title),
+  gameOver: createMusicTrack(MUSIC_FILES.gameOver, MUSIC_VOLUME.gameOver),
   gameplay: createMusicTrack(MUSIC_FILES.gameplay[gameplayMusicIndex], MUSIC_VOLUME.gameplay),
 };
 
@@ -321,7 +324,7 @@ function beginMusic(trackName) {
   currentMusic = trackName;
   musicRequestId += 1;
   const requestId = musicRequestId;
-  track.audio.loop = trackName !== "gameplay" || MUSIC_FILES.gameplay.length < 2;
+  track.audio.loop = trackName === "title" || (trackName === "gameplay" && MUSIC_FILES.gameplay.length < 2);
   track.audio.volume = 0;
 
   track.audio.play()
@@ -400,6 +403,21 @@ function stopGameplayMusic(onComplete) {
   stopMusic("gameplay", true, onComplete);
 }
 
+function playGameOverMusic() {
+  const track = musicTracks.gameOver;
+
+  if (!track.audio.paused) {
+    return;
+  }
+
+  track.audio.currentTime = 0;
+  beginMusic("gameOver");
+}
+
+function stopGameOverMusic(onComplete) {
+  stopMusic("gameOver", true, onComplete);
+}
+
 function pauseCurrentMusic() {
   if (!currentMusic) {
     return;
@@ -419,6 +437,9 @@ function resumeCurrentMusic() {
   } else if (gameState === "start") {
     currentMusic = "title";
     beginMusic("title");
+  } else if (gameState === "gameover") {
+    currentMusic = "gameOver";
+    beginMusic("gameOver");
   }
 }
 
@@ -833,7 +854,7 @@ function endGame() {
   gameOverScreen.classList.remove("hidden");
   pauseScreen.classList.add("hidden");
   hideBossUi();
-  stopGameplayMusic();
+  stopGameplayMusic(() => playGameOverMusic());
   playTone(85, 0.45, "sawtooth", 0.04);
 }
 
