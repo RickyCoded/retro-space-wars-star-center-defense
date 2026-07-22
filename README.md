@@ -29,7 +29,7 @@ http://localhost:8000
 - Move right: Right Arrow or D
 - Shoot: Spacebar
 - Pause or resume: P
-- Mobile: use the on-screen touch buttons
+- Mobile: use the on-screen touch buttons. Tap fire once to enable auto-fire for the rest of that mission.
 
 ## Gameplay
 

@@ -18,6 +18,7 @@ const playAgainButton = document.getElementById("playAgainButton");
 const returnTitleButton = document.getElementById("returnTitleButton");
 const musicToggle = document.getElementById("musicToggle");
 const brandLogo = document.getElementById("brandLogo");
+const touchFireButton = document.getElementById("touchFire");
 const bossHealthBar = document.getElementById("bossHealthBar");
 const bossNameEl = document.getElementById("bossName");
 const bossHealthPercentEl = document.getElementById("bossHealthPercent");
@@ -167,6 +168,7 @@ let musicMuted = false;
 let currentMusic = null;
 let musicRequestId = 0;
 let gameplayMusicIndex = 0;
+let mobileAutoFireEnabled = false;
 
 const musicTracks = {
   title: createMusicTrack(MUSIC_FILES.title, MUSIC_VOLUME.title),
@@ -464,6 +466,12 @@ function makeStars() {
 }
 
 function resetGame() {
+  keys.left = false;
+  keys.right = false;
+  keys.fire = false;
+  mobileAutoFireEnabled = false;
+  touchFireButton.classList.remove("hidden");
+
   player = {
     x: width() / 2,
     y: height() - 70,
@@ -1040,7 +1048,7 @@ function update(delta) {
   player.spreadTimer = Math.max(0, player.spreadTimer - delta);
   fireCooldown = Math.max(0, fireCooldown - delta);
 
-  if (keys.fire) {
+  if (keys.fire || mobileAutoFireEnabled) {
     shootPlayer();
   }
 
@@ -1700,11 +1708,10 @@ bindTouchButton("touchRight", () => {
 });
 
 bindTouchButton("touchFire", () => {
-  keys.fire = true;
+  mobileAutoFireEnabled = true;
+  touchFireButton.classList.add("hidden");
   shootPlayer();
-}, () => {
-  keys.fire = false;
-});
+}, () => {});
 
 resizeCanvas();
 makeStars();
