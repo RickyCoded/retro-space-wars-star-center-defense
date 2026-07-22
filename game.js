@@ -34,6 +34,7 @@ const MUSIC_FILES = {
   gameplay: [
     "assets/audio/gameplay-theme.mp3",
     "assets/audio/gameplay-theme-2.mp3",
+    "assets/audio/gameplay-theme-3.mp3",
   ],
 };
 
