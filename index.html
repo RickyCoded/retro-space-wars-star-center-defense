@@ -55,6 +55,7 @@
         <div id="victoryScreen" class="overlay hidden">
           <div class="overlay-panel">
             <p class="kicker">Alliance Victory</p>
+            <div id="victoryFlash" class="victory-flash">Victory!</div>
             <h2>Star Center Defended</h2>
             <p>The Void Empire fleet has been defeated.</p>
             <p id="victoryScore">Final score: 0</p>
@@ -64,6 +65,10 @@
               <button id="returnTitleButton" type="button">Return to Title</button>
             </div>
           </div>
+        </div>
+
+        <div id="victoryCinematicScreen" class="cinematic-overlay hidden" aria-label="Victory cinematic">
+          <video id="victoryCinematic" class="victory-cinematic" playsinline preload="auto"></video>
         </div>
 
         <div id="bossHealthBar" class="boss-health hidden" aria-label="Boss status">

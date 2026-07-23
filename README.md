@@ -130,6 +130,20 @@ To change music volume, edit the `MUSIC_VOLUME` values near the top of `game.js`
 
 Browsers usually block music until the player interacts with the page. The game starts music only after an input such as clicking **Start Mission**, pressing a key, or using the music button.
 
+## Adding The Victory Cinematic
+
+Place the final victory MP4 file in:
+
+```text
+assets/video/
+```
+
+Use this exact file name:
+
+- `victory-cinematic.mp4` - cinematic played after the final boss is defeated
+
+The cinematic plays once, then the victory screen appears with a flashing **Victory!** message. If the MP4 is missing or cannot play, the game skips directly to the victory screen. To change the filename later, edit the `VICTORY_CINEMATIC_SRC` value near the top of `game.js`.
+
 ## Project Files
 
 - `index.html` - page structure and game screens
@@ -137,4 +151,5 @@ Browsers usually block music until the player interacts with the page. The game 
 - `game.js` - canvas drawing, controls, game loop, enemies, scoring, waves, sound
 - `assets/images/` - optional ship image files
 - `assets/audio/` - optional music files
+- `assets/video/` - optional victory cinematic file
 - `README.md` - local run instructions

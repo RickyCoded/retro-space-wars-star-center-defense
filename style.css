@@ -245,6 +245,46 @@ canvas {
   line-height: 1.5;
 }
 
+.cinematic-overlay {
+  align-items: center;
+  background: #02050d;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  overflow: hidden;
+  position: absolute;
+  z-index: 6;
+}
+
+.victory-cinematic {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.victory-flash {
+  animation: victoryPulse 0.72s steps(2, end) 6;
+  color: #ffe66d;
+  filter: drop-shadow(0 0 12px rgba(77, 227, 255, 0.95));
+  font-size: clamp(1.25rem, 5vw, 2.6rem);
+  font-weight: 900;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+@keyframes victoryPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.28;
+    transform: scale(1.08);
+  }
+}
+
 .overlay button {
   border-radius: 6px;
   margin-top: 22px;

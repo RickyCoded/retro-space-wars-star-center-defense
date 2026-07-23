@@ -12,6 +12,8 @@ const pauseScreen = document.getElementById("pauseScreen");
 const finalScoreEl = document.getElementById("finalScore");
 const victoryScoreEl = document.getElementById("victoryScore");
 const victoryHighScoreEl = document.getElementById("victoryHighScore");
+const victoryCinematicScreen = document.getElementById("victoryCinematicScreen");
+const victoryCinematic = document.getElementById("victoryCinematic");
 const startButton = document.getElementById("startButton");
 const restartButton = document.getElementById("restartButton");
 const playAgainButton = document.getElementById("playAgainButton");
@@ -28,6 +30,9 @@ const bossMessage = document.getElementById("bossMessage");
 // Change this path to swap the header logo later.
 const LOGO_IMAGE_SRC = "assets/images/logo.png";
 brandLogo.src = LOGO_IMAGE_SRC;
+
+// Replace this file to customize the final victory cinematic.
+const VICTORY_CINEMATIC_SRC = "assets/video/victory-cinematic.mp4";
 
 const MUSIC_FILES = {
   title: "assets/audio/title-theme.mp3",
@@ -445,6 +450,7 @@ function resumeCurrentMusic() {
 
 function toggleMute() {
   musicMuted = !musicMuted;
+  victoryCinematic.muted = musicMuted;
   updateMusicButton();
 
   if (musicMuted) {
@@ -532,6 +538,10 @@ function resetGame() {
   startScreen.classList.add("hidden");
   gameOverScreen.classList.add("hidden");
   victoryScreen.classList.add("hidden");
+  victoryCinematicScreen.classList.add("hidden");
+  victoryCinematic.pause();
+  victoryCinematic.removeAttribute("src");
+  victoryCinematic.load();
   pauseScreen.classList.add("hidden");
   hideBossUi();
   updateHud();
@@ -634,6 +644,10 @@ function returnToTitle() {
   startScreen.classList.remove("hidden");
   gameOverScreen.classList.add("hidden");
   victoryScreen.classList.add("hidden");
+  victoryCinematicScreen.classList.add("hidden");
+  victoryCinematic.pause();
+  victoryCinematic.removeAttribute("src");
+  victoryCinematic.load();
   pauseScreen.classList.add("hidden");
   hideBossUi();
   stopGameplayMusic(() => playTitleMusic());
@@ -858,6 +872,32 @@ function endGame() {
   playTone(85, 0.45, "sawtooth", 0.04);
 }
 
+function showVictoryScreen() {
+  if (gameState !== "victory" && gameState !== "cinematic") {
+    return;
+  }
+
+  gameState = "victory";
+  victoryCinematic.pause();
+  victoryCinematicScreen.classList.add("hidden");
+  victoryScreen.classList.remove("hidden");
+}
+
+function playVictoryCinematic() {
+  gameState = "cinematic";
+  victoryScreen.classList.add("hidden");
+  victoryCinematicScreen.classList.remove("hidden");
+  victoryCinematic.muted = musicMuted;
+  victoryCinematic.src = VICTORY_CINEMATIC_SRC;
+  victoryCinematic.currentTime = 0;
+  victoryCinematic.load();
+
+  victoryCinematic.play().catch(() => {
+    console.warn(`Victory cinematic could not be played: ${VICTORY_CINEMATIC_SRC}`);
+    showVictoryScreen();
+  });
+}
+
 function startNextWave() {
   wave += 1;
   powerUpsDroppedThisWave = 0;
@@ -1050,10 +1090,10 @@ function completeGame() {
   powerUps = [];
   victoryScoreEl.textContent = `Final score: ${score}`;
   victoryHighScoreEl.textContent = `High score: ${highScore}`;
-  victoryScreen.classList.remove("hidden");
+  gameOverScreen.classList.add("hidden");
   pauseScreen.classList.add("hidden");
   hideBossUi();
-  stopGameplayMusic();
+  stopGameplayMusic(() => playVictoryCinematic());
 }
 
 function update(delta) {
@@ -1691,6 +1731,14 @@ window.addEventListener("keydown", (event) => {
 });
 window.addEventListener("keyup", (event) => handleKey(event, false));
 window.addEventListener("pointerdown", () => unlockAudio(), { once: true });
+
+victoryCinematic.addEventListener("ended", showVictoryScreen);
+victoryCinematic.addEventListener("error", () => {
+  if (gameState === "cinematic") {
+    console.warn(`Victory cinematic could not be loaded: ${VICTORY_CINEMATIC_SRC}`);
+    showVictoryScreen();
+  }
+});
 
 startButton.addEventListener("click", () => {
   unlockAudio();
