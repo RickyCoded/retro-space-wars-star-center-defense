@@ -1703,17 +1703,43 @@ function bindTouchButton(id, press, release) {
   const button = document.getElementById(id);
   const start = (event) => {
     event.preventDefault();
+    button.blur();
+    button.setPointerCapture?.(event.pointerId);
     unlockAudio();
     press();
   };
   const end = (event) => {
     event.preventDefault();
+    button.releasePointerCapture?.(event.pointerId);
     release();
   };
   button.addEventListener("pointerdown", start);
   button.addEventListener("pointerup", end);
   button.addEventListener("pointercancel", end);
   button.addEventListener("pointerleave", end);
+  button.addEventListener("contextmenu", (event) => event.preventDefault());
+  button.addEventListener("dblclick", (event) => event.preventDefault());
+  button.addEventListener("touchmove", (event) => event.preventDefault(), { passive: false });
+  button.addEventListener("touchend", (event) => event.preventDefault(), { passive: false });
+}
+
+function isGameplayGestureTarget(event) {
+  if (gameState !== "playing") {
+    return false;
+  }
+
+  const target = event.target;
+  if (!(target instanceof Element)) {
+    return false;
+  }
+
+  return target === canvas || Boolean(target.closest("canvas, .stage-wrap, .touch-controls"));
+}
+
+function blockGameplayGesture(event) {
+  if (isGameplayGestureTarget(event)) {
+    event.preventDefault();
+  }
 }
 
 window.addEventListener("resize", () => {
@@ -1731,6 +1757,12 @@ window.addEventListener("keydown", (event) => {
 });
 window.addEventListener("keyup", (event) => handleKey(event, false));
 window.addEventListener("pointerdown", () => unlockAudio(), { once: true });
+document.addEventListener("contextmenu", blockGameplayGesture);
+document.addEventListener("dblclick", blockGameplayGesture, { passive: false });
+document.addEventListener("touchend", blockGameplayGesture, { passive: false });
+document.addEventListener("gesturestart", blockGameplayGesture, { passive: false });
+document.addEventListener("gesturechange", blockGameplayGesture, { passive: false });
+document.addEventListener("gestureend", blockGameplayGesture, { passive: false });
 
 victoryCinematic.addEventListener("ended", showVictoryScreen);
 victoryCinematic.addEventListener("error", () => {

@@ -25,6 +25,7 @@ body {
   height: 100%;
   margin: 0;
   overscroll-behavior: none;
+  touch-action: none;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -41,7 +42,7 @@ body {
   display: grid;
   place-items: center;
   padding: 16px;
-  touch-action: manipulation;
+  touch-action: none;
   -webkit-user-select: none;
   user-select: none;
 }
@@ -54,6 +55,9 @@ button {
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 0 22px rgba(255, 209, 102, 0.34);
+  -webkit-appearance: none;
+  appearance: none;
+  touch-action: none;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
@@ -191,6 +195,7 @@ h1 {
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
+  touch-action: none;
   user-select: none;
   width: 100%;
 }
@@ -388,6 +393,7 @@ canvas {
   position: absolute;
   top: calc(100% + 12px);
   transform: translateX(-50%);
+  touch-action: none;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
@@ -407,6 +413,7 @@ canvas {
   place-items: center;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
+  -webkit-user-drag: none;
   -webkit-user-select: none;
   touch-action: none;
   user-select: none;
