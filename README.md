@@ -141,8 +141,9 @@ assets/audio/
 Use this exact file name:
 
 - `enemy-destroyed.mp3` - played when a normal enemy ship is destroyed
+- `hero-laser.mp3` - played when the Alliance starfighter fires
 
-If the MP3 is missing or cannot play, the game uses the original simple sound effect. To change the filename or volume later, edit the `SOUND_EFFECT_FILES` and `SOUND_EFFECT_VOLUMES` values near the top of `game.js`.
+If an MP3 is missing or cannot play, the game uses the original simple sound effect. To change filenames or volumes later, edit the `SOUND_EFFECT_FILES` and `SOUND_EFFECT_VOLUMES` values near the top of `game.js`.
 
 ## Adding The Victory Cinematic
 

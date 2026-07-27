@@ -55,10 +55,12 @@ const SOUND_EFFECT_VOLUME = 1.75;
 
 const SOUND_EFFECT_FILES = {
   enemyDestroyed: "assets/audio/enemy-destroyed.mp3",
+  heroLaser: "assets/audio/hero-laser.mp3",
 };
 
 const SOUND_EFFECT_VOLUMES = {
   enemyDestroyed: 0.85,
+  heroLaser: 0.7,
 };
 
 const keys = {
@@ -194,6 +196,7 @@ const musicTracks = {
 
 const soundEffects = {
   enemyDestroyed: createSoundEffect(SOUND_EFFECT_FILES.enemyDestroyed, SOUND_EFFECT_VOLUMES.enemyDestroyed),
+  heroLaser: createSoundEffect(SOUND_EFFECT_FILES.heroLaser, SOUND_EFFECT_VOLUMES.heroLaser, 8),
 };
 
 function loadShipImage(src) {
@@ -280,6 +283,10 @@ function playSoundEffect(name, fallback) {
 
 function playEnemyDestroyedSound() {
   playSoundEffect("enemyDestroyed", () => playTone(360, 0.09, "square", 0.035));
+}
+
+function playHeroLaserSound(hasSpreadFire) {
+  playSoundEffect("heroLaser", () => playTone(hasSpreadFire ? 900 : 760, 0.06, "square", 0.025));
 }
 
 function getGameplayMusicSrc() {
@@ -842,7 +849,7 @@ function shootPlayer() {
   });
 
   fireCooldown = hasSpreadFire || player.dualMissile ? 0.14 : 0.18;
-  playTone(hasSpreadFire ? 900 : 760, 0.06, "square", 0.025);
+  playHeroLaserSound(hasSpreadFire);
 }
 
 function spawnPowerUp(x, y, type = "chrono") {
