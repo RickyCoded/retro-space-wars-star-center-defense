@@ -51,7 +51,7 @@ const MUSIC_VOLUME = {
 };
 
 const MUSIC_FADE_MS = 450;
-const SOUND_EFFECT_VOLUME = 1.75;
+const SOUND_EFFECT_VOLUME = 0.95;
 
 const SOUND_EFFECT_FILES = {
   enemyDestroyed: "assets/audio/enemy-destroyed.mp3",
@@ -59,8 +59,8 @@ const SOUND_EFFECT_FILES = {
 };
 
 const SOUND_EFFECT_VOLUMES = {
-  enemyDestroyed: 0.85,
-  heroLaser: 0.7,
+  enemyDestroyed: 0.42,
+  heroLaser: 0.32,
 };
 
 const keys = {

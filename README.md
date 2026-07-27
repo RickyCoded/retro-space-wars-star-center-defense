@@ -145,6 +145,12 @@ Use this exact file name:
 
 If an MP3 is missing or cannot play, the game uses the original simple sound effect. To change filenames or volumes later, edit the `SOUND_EFFECT_FILES` and `SOUND_EFFECT_VOLUMES` values near the top of `game.js`.
 
+Current sound-effect volume settings:
+
+- Enemy destroyed MP3 volume defaults to `0.42`
+- Hero laser MP3 volume defaults to `0.32`
+- Generated fallback sound-effect multiplier defaults to `0.95`
+
 ## Adding The Victory Cinematic
 
 Place the final victory MP4 file in:
