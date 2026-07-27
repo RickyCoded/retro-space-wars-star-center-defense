@@ -147,9 +147,9 @@ If an MP3 is missing or cannot play, the game uses the original simple sound eff
 
 Current sound-effect volume settings:
 
-- Enemy destroyed MP3 volume defaults to `0.42`
-- Hero laser MP3 volume defaults to `0.32`
-- Generated fallback sound-effect multiplier defaults to `0.95`
+- Enemy destroyed MP3 volume defaults to `0.24`
+- Hero laser MP3 volume defaults to `0.18`
+- Generated fallback sound-effect multiplier defaults to `0.55`
 
 ## Adding The Victory Cinematic
 
