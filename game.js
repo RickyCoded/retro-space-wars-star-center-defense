@@ -53,6 +53,14 @@ const MUSIC_VOLUME = {
 const MUSIC_FADE_MS = 450;
 const SOUND_EFFECT_VOLUME = 1.75;
 
+const SOUND_EFFECT_FILES = {
+  enemyDestroyed: "assets/audio/enemy-destroyed.mp3",
+};
+
+const SOUND_EFFECT_VOLUMES = {
+  enemyDestroyed: 0.85,
+};
+
 const keys = {
   left: false,
   right: false,
@@ -184,6 +192,10 @@ const musicTracks = {
   gameplay: createMusicTrack(MUSIC_FILES.gameplay[gameplayMusicIndex], MUSIC_VOLUME.gameplay),
 };
 
+const soundEffects = {
+  enemyDestroyed: createSoundEffect(SOUND_EFFECT_FILES.enemyDestroyed, SOUND_EFFECT_VOLUMES.enemyDestroyed),
+};
+
 function loadShipImage(src) {
   const asset = {
     image: new Image(),
@@ -221,6 +233,53 @@ function createMusicTrack(src, volume) {
   });
 
   return track;
+}
+
+function createSoundEffect(src, volume, poolSize = 5) {
+  const effect = {
+    src,
+    volume,
+    failed: false,
+    index: 0,
+    pool: [],
+  };
+
+  effect.pool = Array.from({ length: poolSize }, () => {
+    const audio = new Audio(src);
+    audio.preload = "auto";
+    audio.volume = volume;
+    audio.addEventListener("error", () => {
+      effect.failed = true;
+      console.warn(`Sound effect could not be loaded: ${effect.src}`);
+    });
+    return audio;
+  });
+
+  return effect;
+}
+
+function playSoundEffect(name, fallback) {
+  const effect = soundEffects[name];
+
+  if (!musicUnlocked || !effect || effect.failed) {
+    fallback?.();
+    return;
+  }
+
+  const audio = effect.pool[effect.index];
+  effect.index = (effect.index + 1) % effect.pool.length;
+  audio.currentTime = 0;
+  audio.volume = effect.volume;
+  audio.play().catch(() => {
+    if (audio.error) {
+      effect.failed = true;
+    }
+    fallback?.();
+  });
+}
+
+function playEnemyDestroyedSound() {
+  playSoundEffect("enemyDestroyed", () => playTone(360, 0.09, "square", 0.035));
 }
 
 function getGameplayMusicSrc() {
@@ -1212,7 +1271,7 @@ function checkCollisions() {
           score += enemy.points;
           addExplosion(enemy.x, enemy.y, "#ff4f78");
           maybeDropPowerUp(enemy);
-          playTone(360, 0.09, "square", 0.035);
+          playEnemyDestroyedSound();
         }
       }
     });

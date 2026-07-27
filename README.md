@@ -130,6 +130,20 @@ To change music volume, edit the `MUSIC_VOLUME` values near the top of `game.js`
 
 Browsers usually block music until the player interacts with the page. The game starts music only after an input such as clicking **Start Mission**, pressing a key, or using the music button.
 
+## Adding Sound Effects
+
+Place custom sound-effect MP3 files in:
+
+```text
+assets/audio/
+```
+
+Use this exact file name:
+
+- `enemy-destroyed.mp3` - played when a normal enemy ship is destroyed
+
+If the MP3 is missing or cannot play, the game uses the original simple sound effect. To change the filename or volume later, edit the `SOUND_EFFECT_FILES` and `SOUND_EFFECT_VOLUMES` values near the top of `game.js`.
+
 ## Adding The Victory Cinematic
 
 Place the final victory MP4 file in:
