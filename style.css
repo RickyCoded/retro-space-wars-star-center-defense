@@ -388,7 +388,7 @@ canvas {
 .touch-controls {
   bottom: auto;
   display: none;
-  gap: clamp(22px, 8vw, 44px);
+  gap: clamp(14px, 5vw, 36px);
   left: 50%;
   position: absolute;
   top: calc(100% + 12px);
@@ -439,6 +439,26 @@ canvas {
 
 .touch-controls #touchRight::before {
   content: "\203A";
+}
+
+.touch-controls #touchPause {
+  background: rgba(148, 169, 188, 0.92);
+  border-radius: 10px;
+  color: #07111d;
+  font-size: 0.72rem;
+  height: 46px;
+  min-width: 62px;
+  padding: 0 10px;
+  text-transform: uppercase;
+  width: auto;
+}
+
+.touch-controls #touchPause::before {
+  content: none;
+}
+
+.touch-controls #touchPause[aria-pressed="true"] {
+  background: rgba(255, 209, 102, 0.92);
 }
 
 .touch-controls #touchFire {

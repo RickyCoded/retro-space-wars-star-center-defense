@@ -21,6 +21,7 @@ const returnTitleButton = document.getElementById("returnTitleButton");
 const musicToggle = document.getElementById("musicToggle");
 const brandLogo = document.getElementById("brandLogo");
 const touchFireButton = document.getElementById("touchFire");
+const touchPauseButton = document.getElementById("touchPause");
 const bossHealthBar = document.getElementById("bossHealthBar");
 const bossNameEl = document.getElementById("bossName");
 const bossHealthPercentEl = document.getElementById("bossHealthPercent");
@@ -617,6 +618,7 @@ function resetGame() {
   victoryCinematic.load();
   pauseScreen.classList.add("hidden");
   hideBossUi();
+  updateTouchPauseButton();
   updateHud();
   playGameplayMusic();
 }
@@ -724,6 +726,7 @@ function returnToTitle() {
   pauseScreen.classList.add("hidden");
   hideBossUi();
   stopGameplayMusic(() => playTitleMusic());
+  updateTouchPauseButton();
   updateHud();
 }
 
@@ -954,6 +957,7 @@ function endGame() {
   gameOverScreen.classList.remove("hidden");
   pauseScreen.classList.add("hidden");
   hideBossUi();
+  updateTouchPauseButton();
   stopGameplayMusic(() => playGameOverMusic());
   playTone(85, 0.45, "sawtooth", 0.04);
 }
@@ -967,6 +971,7 @@ function showVictoryScreen() {
   victoryCinematic.pause();
   victoryCinematicScreen.classList.add("hidden");
   victoryScreen.classList.remove("hidden");
+  updateTouchPauseButton();
 }
 
 function playVictoryCinematic() {
@@ -1198,6 +1203,7 @@ function completeGame() {
   gameOverScreen.classList.add("hidden");
   pauseScreen.classList.add("hidden");
   hideBossUi();
+  updateTouchPauseButton();
   stopGameplayMusic(() => playVictoryCinematic());
 }
 
@@ -1800,6 +1806,14 @@ function setPaused(paused) {
     lastTime = performance.now();
     resumeCurrentMusic();
   }
+  updateTouchPauseButton();
+}
+
+function updateTouchPauseButton() {
+  const isPaused = gameState === "paused";
+  touchPauseButton.textContent = isPaused ? "Resume" : "Pause";
+  touchPauseButton.setAttribute("aria-label", isPaused ? "Resume game" : "Pause game");
+  touchPauseButton.setAttribute("aria-pressed", String(isPaused));
 }
 
 function handleKey(event, isDown) {
@@ -1938,9 +1952,14 @@ bindTouchButton("touchFire", () => {
   shootPlayer();
 }, () => {});
 
+bindTouchButton("touchPause", () => {
+  setPaused(gameState === "playing");
+}, () => {});
+
 resizeCanvas();
 makeStars();
 updateHud();
 updateMusicButton();
+updateTouchPauseButton();
 draw();
 requestAnimationFrame(loop);
