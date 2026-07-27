@@ -907,19 +907,32 @@ function shootEnemy(enemy) {
   playTone(220, 0.08, "sawtooth", 0.018);
 }
 
-function addExplosion(x, y, color) {
-  for (let i = 0; i < 18; i += 1) {
+function addExplosion(x, y, color, count = 18, size = 3, speedBoost = 1) {
+  for (let i = 0; i < count; i += 1) {
     const angle = Math.random() * Math.PI * 2;
     particles.push({
       x,
       y,
-      vx: Math.cos(angle) * (60 + Math.random() * 150),
-      vy: Math.sin(angle) * (60 + Math.random() * 150),
+      vx: Math.cos(angle) * (60 + Math.random() * 150) * speedBoost,
+      vy: Math.sin(angle) * (60 + Math.random() * 150) * speedBoost,
       life: 0.42 + Math.random() * 0.3,
       maxLife: 0.72,
       color,
+      size,
     });
   }
+}
+
+function addBossExplosionBurst() {
+  if (!boss) {
+    return;
+  }
+
+  const offsetX = (Math.random() - 0.5) * boss.width * 0.82;
+  const offsetY = (Math.random() - 0.5) * boss.height * 0.58;
+  const colors = ["#ff4f78", "#ffd166", "#8df7ff", "#ff7a2f", "#ffffff"];
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  addExplosion(boss.x + offsetX, boss.y + offsetY, color, 26, 4 + Math.random() * 3, 1.18);
 }
 
 function hitPlayer(damage) {
@@ -1044,6 +1057,21 @@ function updateBoss(delta) {
 
   if (bossMode === "defeated") {
     bossDefeatTimer -= delta;
+    if (boss) {
+      boss.explosionTimer += delta;
+      boss.explosionBurstTimer -= delta;
+      boss.pulseTimer += delta * 6;
+      boss.hitFlash = 0.12;
+      boss.shake = Math.max(0, 9 * (bossDefeatTimer / 2.4));
+      boss.y += 7 * delta;
+      boss.opacity = Math.max(0, Math.min(1, bossDefeatTimer / 1.25));
+
+      if (boss.explosionBurstTimer <= 0) {
+        addBossExplosionBurst();
+        boss.explosionBurstTimer = 0.08 + Math.random() * 0.12;
+      }
+    }
+
     if (bossDefeatTimer <= 0) {
       if (boss?.number === 5) {
         completeGame();
@@ -1123,6 +1151,10 @@ function defeatBoss() {
   }
 
   boss.defeated = true;
+  boss.explosionTimer = 0;
+  boss.explosionBurstTimer = 0;
+  boss.opacity = 1;
+  boss.shake = 9;
   if (boss.number === 1) {
     firstBossDefeated = true;
   }
@@ -1131,9 +1163,9 @@ function defeatBoss() {
   }
   score += boss.scoreValue;
   updateHud();
-  addExplosion(boss.x, boss.y, "#ff4f78");
-  addExplosion(boss.x - boss.width * 0.22, boss.y + 8, "#ffd166");
-  addExplosion(boss.x + boss.width * 0.22, boss.y + 8, "#8df7ff");
+  addExplosion(boss.x, boss.y, "#ff4f78", 42, 5, 1.25);
+  addExplosion(boss.x - boss.width * 0.22, boss.y + 8, "#ffd166", 30, 4, 1.2);
+  addExplosion(boss.x + boss.width * 0.22, boss.y + 8, "#8df7ff", 30, 4, 1.2);
   showBossMessage("VOID CRUISER DESTROYED", 2);
   bossMode = "defeated";
   bossDefeatTimer = 2.4;
@@ -1569,14 +1601,31 @@ function drawBoss() {
     return;
   }
 
-  ctx.save();
-  ctx.translate(boss.x, boss.y);
+  const isDefeated = bossMode === "defeated";
+  const shakeAmount = isDefeated ? boss.shake || 0 : 0;
+  const shakeX = (Math.random() - 0.5) * shakeAmount;
+  const shakeY = (Math.random() - 0.5) * shakeAmount;
 
-  if (boss.hitFlash > 0 || (boss.phase > 1 && Math.floor(boss.pulseTimer * 8) % 2 === 0)) {
+  ctx.save();
+  ctx.translate(boss.x + shakeX, boss.y + shakeY);
+
+  if (isDefeated) {
+    const glow = ctx.createRadialGradient(0, 0, boss.width * 0.1, 0, 0, boss.width * 0.72);
+    glow.addColorStop(0, "rgba(255, 209, 102, 0.55)");
+    glow.addColorStop(0.45, "rgba(255, 79, 120, 0.28)");
+    glow.addColorStop(1, "rgba(255, 79, 120, 0)");
+    ctx.globalCompositeOperation = "lighter";
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(0, 0, boss.width * 0.72, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalCompositeOperation = "source-over";
+    ctx.globalAlpha = boss.opacity ?? 1;
+  } else if (boss.hitFlash > 0 || (boss.phase > 1 && Math.floor(boss.pulseTimer * 8) % 2 === 0)) {
     ctx.globalAlpha = boss.hitFlash > 0 ? 0.72 : 0.9;
   }
 
-  const sizePulse = boss.phase > 1 ? Math.sin(boss.pulseTimer * 8) * 3 : 0;
+  const sizePulse = !isDefeated && boss.phase > 1 ? Math.sin(boss.pulseTimer * 8) * 3 : 0;
   if (!drawImageContain(shipImages[boss.imageKey], 0, 0, boss.width + sizePulse, boss.height + sizePulse)) {
     drawBossFallback(boss.width + sizePulse, boss.height + sizePulse);
   }
@@ -1716,9 +1765,10 @@ function drawEnemyBullet(bullet) {
 
 function drawParticle(particle) {
   const alpha = Math.max(0, particle.life / particle.maxLife);
+  const size = particle.size || 3;
   ctx.globalAlpha = alpha;
   ctx.fillStyle = particle.color;
-  ctx.fillRect(particle.x, particle.y, 3, 3);
+  ctx.fillRect(particle.x - size / 2, particle.y - size / 2, size, size);
   ctx.globalAlpha = 1;
 }
 
