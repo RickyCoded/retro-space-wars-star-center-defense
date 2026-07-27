@@ -140,6 +140,7 @@ assets/audio/
 
 Use this exact file name:
 
+- `boss-destroyed.mp3` - played when a large boss cruiser is destroyed
 - `enemy-destroyed.mp3` - played when a normal enemy ship is destroyed
 - `hero-laser.mp3` - played when the Alliance starfighter fires
 
@@ -147,6 +148,7 @@ If an MP3 is missing or cannot play, the game uses the original simple sound eff
 
 Current sound-effect volume settings:
 
+- Boss destroyed MP3 volume defaults to `0.26`
 - Enemy destroyed MP3 volume defaults to `0.18`
 - Hero laser MP3 volume defaults to `0.13`
 - Generated fallback sound-effect multiplier defaults to `0.42`

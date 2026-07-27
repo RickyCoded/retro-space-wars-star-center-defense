@@ -54,11 +54,13 @@ const MUSIC_FADE_MS = 450;
 const SOUND_EFFECT_VOLUME = 0.42;
 
 const SOUND_EFFECT_FILES = {
+  bossDestroyed: "assets/audio/boss-destroyed.mp3",
   enemyDestroyed: "assets/audio/enemy-destroyed.mp3",
   heroLaser: "assets/audio/hero-laser.mp3",
 };
 
 const SOUND_EFFECT_VOLUMES = {
+  bossDestroyed: 0.26,
   enemyDestroyed: 0.18,
   heroLaser: 0.13,
 };
@@ -195,6 +197,7 @@ const musicTracks = {
 };
 
 const soundEffects = {
+  bossDestroyed: createSoundEffect(SOUND_EFFECT_FILES.bossDestroyed, SOUND_EFFECT_VOLUMES.bossDestroyed, 3),
   enemyDestroyed: createSoundEffect(SOUND_EFFECT_FILES.enemyDestroyed, SOUND_EFFECT_VOLUMES.enemyDestroyed),
   heroLaser: createSoundEffect(SOUND_EFFECT_FILES.heroLaser, SOUND_EFFECT_VOLUMES.heroLaser, 8),
 };
@@ -287,6 +290,10 @@ function playEnemyDestroyedSound() {
 
 function playHeroLaserSound(hasSpreadFire) {
   playSoundEffect("heroLaser", () => playTone(hasSpreadFire ? 900 : 760, 0.06, "square", 0.025));
+}
+
+function playBossDestroyedSound() {
+  playSoundEffect("bossDestroyed", () => playTone(70, 0.35, "sawtooth", 0.045));
 }
 
 function getGameplayMusicSrc() {
@@ -1134,7 +1141,7 @@ function defeatBoss() {
   setTimeout(() => {
     enemyBullets = enemyBullets.filter((bullet) => !bullet.fromBoss);
   }, 450);
-  playTone(70, 0.35, "sawtooth", 0.045);
+  playBossDestroyedSound();
 
   if (boss.number !== 5) {
     const rewardType = boss.number === 2 ? "dualMissilePlus" : "dualMissile";
