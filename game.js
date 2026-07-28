@@ -586,6 +586,8 @@ function resetGame() {
     dualMissile: false,
     dualMissileShotCount: 0,
     dualMissileMissileUpgrade: false,
+    overShield: 0,
+    overShieldMax: 20,
   };
   bullets = [];
   enemyBullets = [];
@@ -863,11 +865,12 @@ function shootPlayer() {
 }
 
 function spawnPowerUp(x, y, type = "chrono") {
+  const isBossReward = type === "dualMissile" || type === "dualMissilePlus" || type === "overShield";
   powerUps.push({
     type,
     x,
     y,
-    radius: type === "dualMissile" || type === "dualMissilePlus" ? 17 : 15,
+    radius: isBossReward ? 17 : 15,
     speed: 95,
     spin: Math.random() * Math.PI * 2,
     drift: Math.random() > 0.5 ? 24 : -24,
@@ -884,6 +887,14 @@ function collectPowerUp(powerUp) {
     player.dualMissileShotCount = 0;
     addExplosion(powerUp.x, powerUp.y, "#ffd166");
     playTone(620, 0.18, "square", 0.04);
+    return;
+  }
+
+  if (powerUp.type === "overShield") {
+    player.overShield = player.overShieldMax;
+    addExplosion(powerUp.x, powerUp.y, "#7dffb2", 26, 4, 1.12);
+    playTone(760, 0.22, "triangle", 0.045);
+    playTone(1140, 0.18, "triangle", 0.035);
     return;
   }
 
@@ -942,9 +953,18 @@ function hitPlayer(damage) {
   if (player.invulnerable > 0) {
     return;
   }
-  player.health -= damage;
+
+  let remainingDamage = damage;
+  if (player.overShield > 0) {
+    const absorbedDamage = Math.min(player.overShield, remainingDamage);
+    player.overShield -= absorbedDamage;
+    remainingDamage -= absorbedDamage;
+    addExplosion(player.x, player.y, "#7dffb2", player.overShield > 0 ? 12 : 22, 4, 0.9);
+  }
+
+  player.health -= remainingDamage;
   player.invulnerable = 0.8;
-  addExplosion(player.x, player.y, "#4de3ff");
+  addExplosion(player.x, player.y, remainingDamage > 0 ? "#4de3ff" : "#7dffb2");
   playTone(120, 0.16, "triangle", 0.045);
   if (player.health <= 0) {
     endGame();
@@ -1181,7 +1201,11 @@ function defeatBoss() {
   playBossDestroyedSound();
 
   if (boss.number !== 5) {
-    const rewardType = boss.number === 2 ? "dualMissilePlus" : "dualMissile";
+    const rewardType = boss.number === 3
+      ? "overShield"
+      : boss.number === 2
+        ? "dualMissilePlus"
+        : "dualMissile";
     spawnPowerUp(boss.x, boss.y + boss.height * 0.25, rewardType);
   }
 
@@ -1543,11 +1567,34 @@ function drawPlayer() {
     return;
   }
 
+  if (player.overShield > 0) {
+    drawPlayerOverShield();
+  }
+
   if (drawShipImage(shipImages.player, player.x, player.y, 56, 60)) {
     return;
   }
 
   drawPlayerFallback();
+}
+
+function drawPlayerOverShield() {
+  const shieldRatio = Math.max(0, Math.min(1, player.overShield / player.overShieldMax));
+  const pulse = 1 + Math.sin(performance.now() / 120) * 0.05;
+
+  ctx.save();
+  ctx.translate(player.x, player.y);
+  ctx.globalAlpha = 0.26 + shieldRatio * 0.22;
+  ctx.strokeStyle = "#7dffb2";
+  ctx.fillStyle = "rgba(125, 255, 178, 0.1)";
+  ctx.shadowBlur = 22;
+  ctx.shadowColor = "#7dffb2";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 34 * pulse, 38 * pulse, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
 }
 
 function drawPlayerFallback() {
@@ -1669,6 +1716,8 @@ function drawPowerUp(powerUp) {
 
   if (powerUp.type === "dualMissile" || powerUp.type === "dualMissilePlus") {
     drawDualMissilePowerUpFallback();
+  } else if (powerUp.type === "overShield") {
+    drawOverShieldPowerUpFallback();
   } else if (!drawShipImage(shipImages.powerUp, 0, 0, 34, 34)) {
     drawPowerUpFallback();
   }
@@ -1716,6 +1765,31 @@ function drawDualMissilePowerUpFallback() {
   ctx.fillStyle = "#07111d";
   ctx.fillRect(-7, -7, 4, 18);
   ctx.fillRect(3, -7, 4, 18);
+}
+
+function drawOverShieldPowerUpFallback() {
+  ctx.shadowBlur = 18;
+  ctx.shadowColor = "#7dffb2";
+  ctx.fillStyle = "rgba(125, 255, 178, 0.78)";
+  ctx.strokeStyle = "#f5fbff";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(0, 0, 17, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = "#07111d";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(0, -10);
+  ctx.lineTo(9, -4);
+  ctx.lineTo(6, 10);
+  ctx.lineTo(0, 14);
+  ctx.lineTo(-6, 10);
+  ctx.lineTo(-9, -4);
+  ctx.closePath();
+  ctx.stroke();
 }
 
 function drawShipImage(asset, x, y, drawWidth, drawHeight) {
