@@ -388,11 +388,13 @@ canvas {
 .touch-controls {
   bottom: auto;
   display: none;
-  gap: clamp(14px, 5vw, 36px);
-  left: 50%;
+  gap: clamp(18px, 6vw, 34px);
+  grid-template-columns: 54px 62px 54px;
+  justify-content: center;
+  left: 0;
   position: absolute;
+  right: 0;
   top: calc(100% + 12px);
-  transform: translateX(-50%);
   touch-action: none;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -432,16 +434,29 @@ canvas {
   content: "\2039";
 }
 
+.touch-controls #touchLeft {
+  grid-column: 1;
+}
+
 .touch-controls #touchFire::before {
   content: "\2022";
   font-size: 2.4rem;
+}
+
+.touch-controls #touchFire {
+  grid-column: 2;
 }
 
 .touch-controls #touchRight::before {
   content: "\203A";
 }
 
+.touch-controls #touchRight {
+  grid-column: 3;
+}
+
 .touch-controls #touchPause {
+  align-self: center;
   background: rgba(148, 169, 188, 0.92);
   border-radius: 10px;
   color: #07111d;
@@ -449,7 +464,11 @@ canvas {
   height: 46px;
   min-width: 62px;
   padding: 0 10px;
+  position: absolute;
+  right: 0;
   text-transform: uppercase;
+  top: 50%;
+  transform: translateY(-50%);
   width: auto;
 }
 
@@ -537,7 +556,7 @@ canvas {
   }
 
   .touch-controls {
-    display: flex;
+    display: grid;
   }
 
   .controls-note {
@@ -563,6 +582,6 @@ canvas {
   }
 
   .touch-controls {
-    display: flex;
+    display: grid;
   }
 }
