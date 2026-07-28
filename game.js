@@ -586,6 +586,7 @@ function resetGame() {
     dualMissile: false,
     dualMissileShotCount: 0,
     dualMissileMissileUpgrade: false,
+    redDualLaser: false,
     overShield: 0,
     overShieldMax: 20,
   };
@@ -818,7 +819,8 @@ function shootPlayer() {
   }
 
   const hasSpreadFire = player.spreadTimer > 0 || player.permanentChrono;
-  const isDualMissileShot = player.dualMissile && !hasSpreadFire;
+  const isRedDualLaserShot = player.redDualLaser && !hasSpreadFire;
+  const isDualMissileShot = player.dualMissile && !hasSpreadFire && !isRedDualLaserShot;
   if (isDualMissileShot) {
     player.dualMissileShotCount += 1;
   }
@@ -829,6 +831,11 @@ function shootPlayer() {
         { xOffset: 0, vx: 0 },
         { xOffset: 9, vx: 175 },
       ]
+    : player.redDualLaser
+      ? [
+          { xOffset: -12, vx: -42, color: "#ff3b4f", damage: 1.35 },
+          { xOffset: 12, vx: 42, color: "#ff3b4f", damage: 1.35 },
+        ]
     : player.dualMissile
       ? [
           { xOffset: -11, vx: -38, color: "#8df7ff" },
@@ -851,7 +858,7 @@ function shootPlayer() {
     bullets.push({
       x: player.x + shot.xOffset,
       y: player.y - 20,
-      radius: shot.radius || (isDualMissileShot ? 5 : 4),
+      radius: shot.radius || (isDualMissileShot || isRedDualLaserShot ? 5 : 4),
       speed: shot.speed || 520,
       vx: shot.vx,
       color: shot.color || "#ffd166",
@@ -860,12 +867,12 @@ function shootPlayer() {
     });
   });
 
-  fireCooldown = hasSpreadFire || player.dualMissile ? 0.14 : 0.18;
+  fireCooldown = hasSpreadFire || player.dualMissile || player.redDualLaser ? 0.14 : 0.18;
   playHeroLaserSound(hasSpreadFire);
 }
 
 function spawnPowerUp(x, y, type = "chrono") {
-  const isBossReward = type === "dualMissile" || type === "dualMissilePlus" || type === "overShield";
+  const isBossReward = type === "dualMissile" || type === "dualMissilePlus" || type === "overShield" || type === "redDualLaser";
   powerUps.push({
     type,
     x,
@@ -887,6 +894,15 @@ function collectPowerUp(powerUp) {
     player.dualMissileShotCount = 0;
     addExplosion(powerUp.x, powerUp.y, "#ffd166");
     playTone(620, 0.18, "square", 0.04);
+    return;
+  }
+
+  if (powerUp.type === "redDualLaser") {
+    player.redDualLaser = true;
+    player.dualMissileShotCount = 0;
+    addExplosion(powerUp.x, powerUp.y, "#ff3b4f", 30, 4, 1.14);
+    playTone(520, 0.16, "square", 0.04);
+    playTone(780, 0.2, "square", 0.035);
     return;
   }
 
@@ -1201,11 +1217,11 @@ function defeatBoss() {
   playBossDestroyedSound();
 
   if (boss.number !== 5) {
-    const rewardType = boss.number === 3
-      ? "overShield"
-      : boss.number === 2
-        ? "dualMissilePlus"
-        : "dualMissile";
+    const rewardType = {
+      2: "dualMissilePlus",
+      3: "overShield",
+      4: "redDualLaser",
+    }[boss.number] || "dualMissile";
     spawnPowerUp(boss.x, boss.y + boss.height * 0.25, rewardType);
   }
 
@@ -1354,7 +1370,7 @@ function checkCollisions() {
 
     if (boss && bossMode === "active" && distance(bullet, boss) < bullet.radius + boss.radius) {
       bullet.y = -100;
-      damageBoss(bullet.missile ? 18 : 10);
+      damageBoss(bullet.missile ? 18 : (bullet.damage || 1) * 10);
       addExplosion(bullet.x, bullet.y, "#ff4f78");
     }
   });
@@ -1714,8 +1730,8 @@ function drawPowerUp(powerUp) {
   ctx.translate(powerUp.x, powerUp.y);
   ctx.rotate(powerUp.spin * 0.65);
 
-  if (powerUp.type === "dualMissile" || powerUp.type === "dualMissilePlus") {
-    drawDualMissilePowerUpFallback();
+  if (powerUp.type === "dualMissile" || powerUp.type === "dualMissilePlus" || powerUp.type === "redDualLaser") {
+    drawDualMissilePowerUpFallback(powerUp.type === "redDualLaser");
   } else if (powerUp.type === "overShield") {
     drawOverShieldPowerUpFallback();
   } else if (!drawShipImage(shipImages.powerUp, 0, 0, 34, 34)) {
@@ -1745,11 +1761,11 @@ function drawPowerUpFallback() {
   ctx.fillRect(-3, -6, 6, 12);
 }
 
-function drawDualMissilePowerUpFallback() {
+function drawDualMissilePowerUpFallback(isRedUpgrade = false) {
   ctx.shadowBlur = 16;
-  ctx.shadowColor = "#ffd166";
-  ctx.fillStyle = "#ffd166";
-  ctx.strokeStyle = "#8df7ff";
+  ctx.shadowColor = isRedUpgrade ? "#ff3b4f" : "#ffd166";
+  ctx.fillStyle = isRedUpgrade ? "#ff3b4f" : "#ffd166";
+  ctx.strokeStyle = isRedUpgrade ? "#ffd166" : "#8df7ff";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(0, -18);
@@ -1765,6 +1781,10 @@ function drawDualMissilePowerUpFallback() {
   ctx.fillStyle = "#07111d";
   ctx.fillRect(-7, -7, 4, 18);
   ctx.fillRect(3, -7, 4, 18);
+  if (isRedUpgrade) {
+    ctx.fillStyle = "#ffd166";
+    ctx.fillRect(-6, -1, 12, 3);
+  }
 }
 
 function drawOverShieldPowerUpFallback() {
