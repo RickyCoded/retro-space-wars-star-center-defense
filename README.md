@@ -38,10 +38,12 @@ http://localhost:8000
 - Track your high score in the HUD.
 - Avoid enemy ships and enemy fire.
 - Collect Chrono Crystals to briefly unlock spread fire.
-- Before Boss 1 is defeated, only smaller heavy boss ships can drop Chrono Crystals, up to three per wave.
-- After Boss 1 is defeated, regular normal ships can also drop Chrono Crystals, up to five per wave.
-- Defeated boss cruisers drop a permanent dual missile gun power-up.
+- Only smaller heavy mini-boss ships can drop Chrono Crystals.
+- Chrono Crystal drops have a 55% chance from eligible heavy mini-boss ships, up to three per wave.
+- Defeated boss cruisers drop special boss rewards: Boss 1 drops dual missiles, Boss 2 drops dual missiles with every-fourth-shot missile fire, Boss 3 drops an over-shield, and Boss 4 drops stronger red dual lasers.
 - Chrono Crystals temporarily override the dual missile gun with spread fire, then revert back to dual missiles when the Chrono effect ends.
+- The over-shield makes the hero ship glow and absorbs 20 damage before normal shield takes damage again.
+- The red dual-laser reward fires two red shots that hit slightly harder than the blue dual lasers.
 - Fight a Void Empire cruiser boss every 5 waves.
 - Defeat Boss 5 to complete the game.
 - Each wave gets harder and adds more enemies.
@@ -93,6 +95,28 @@ Boss values are stored in the `bossConfigs` array near the top of `game.js`.
 - Change boss waves with `wave`
 - Change boss attacks with `patterns`
 - Change boss score bonuses with `scoreValue`
+
+Boss reward drops are assigned in the `defeatBoss()` function in `game.js`. The Wave 15 boss uses the `overShield` reward, and the Wave 20 boss uses the `redDualLaser` reward. To change the over-shield strength, edit the player's `overShieldMax` value in `resetGame()`. To adjust the red laser strength, edit the `damage` values in the red dual-laser shot entries inside `shootPlayer()`.
+
+## Current Power-Up Settings
+
+Chrono Crystal drops are controlled by the `maybeDropPowerUp()` function in `game.js`.
+
+- Eligible drop source: smaller heavy mini-boss ships only
+- Drop chance: `0.55`, or 55%, when an eligible ship is destroyed
+- Drop cap: `3` Chrono Crystals per wave
+- Drop cap reset: every new wave
+- Pickup duration: `7` seconds of spread fire
+- Pickup image: `assets/images/powerUp.png`
+- Fallback: if `powerUp.png` is missing, the game draws the Chrono Crystal with canvas shapes
+
+Boss cruiser rewards are separate from Chrono Crystal drops:
+
+- Wave 5 Boss 1: `dualMissile`
+- Wave 10 Boss 2: `dualMissilePlus`
+- Wave 15 Boss 3: `overShield`
+- Wave 20 Boss 4: `redDualLaser`
+- Wave 25 Boss 5: final victory, no power-up drop
 
 Available boss attack pattern names are:
 
