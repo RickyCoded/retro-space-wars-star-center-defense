@@ -44,6 +44,7 @@ http://localhost:8000
 - Chrono Crystals temporarily override the dual missile gun with spread fire, then revert back to dual missiles when the Chrono effect ends.
 - The over-shield makes the hero ship glow and absorbs 20 damage before normal shield takes damage again.
 - The red dual-laser reward fires two red shots that hit slightly harder than the blue dual lasers.
+- After Wave 20, the Quantum Disruptor can appear once on a random normal wave and equips a piercing ultra laser until the hero receives 10 damage.
 - Fight a Void Empire cruiser boss every 5 waves.
 - Defeat Boss 5 to complete the game.
 - Each wave gets harder and adds more enemies.
@@ -117,6 +118,17 @@ Boss cruiser rewards are separate from Chrono Crystal drops:
 - Wave 15 Boss 3: `overShield`
 - Wave 20 Boss 4: `redDualLaser`
 - Wave 25 Boss 5: final victory, no power-up drop
+
+Quantum Disruptor settings:
+
+- First possible wave: Wave 21
+- Last possible wave: Wave 24
+- Appearance limit: once per game
+- Spawn timing: one random normal wave after Wave 20
+- Weapon effect: one ultra laser shot that pierces through enemies and keeps traveling
+- Weapon priority: overrides Chrono Crystal, blue dual lasers, and red dual lasers while active
+- Damage limit: deactivates after the hero receives `10` incoming damage
+- Boss behavior: can be carried into the final boss fight if the hero has not taken enough damage to deactivate it
 
 Available boss attack pattern names are:
 

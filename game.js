@@ -180,6 +180,8 @@ let enemiesRemaining = 0;
 let spawnTimer = 0;
 let powerUpsDroppedThisWave = 0;
 let firstBossDefeated = false;
+let quantumDisruptorOffered = false;
+let quantumDisruptorWave = 0;
 let fireCooldown = 0;
 let gameState = "start";
 let lastTime = 0;
@@ -587,6 +589,9 @@ function resetGame() {
     dualMissileShotCount: 0,
     dualMissileMissileUpgrade: false,
     redDualLaser: false,
+    quantumDisruptor: false,
+    quantumDamageTaken: 0,
+    quantumDamageLimit: 10,
     overShield: 0,
     overShieldMax: 20,
   };
@@ -609,6 +614,8 @@ function resetGame() {
   spawnTimer = 0.4;
   powerUpsDroppedThisWave = 0;
   firstBossDefeated = false;
+  quantumDisruptorOffered = false;
+  quantumDisruptorWave = 21 + Math.floor(Math.random() * 4);
   fireCooldown = 0;
   gameState = "playing";
   lastTime = performance.now();
@@ -818,14 +825,27 @@ function shootPlayer() {
     return;
   }
 
-  const hasSpreadFire = player.spreadTimer > 0 || player.permanentChrono;
-  const isRedDualLaserShot = player.redDualLaser && !hasSpreadFire;
-  const isDualMissileShot = player.dualMissile && !hasSpreadFire && !isRedDualLaserShot;
+  const hasQuantumDisruptor = player.quantumDisruptor;
+  const hasSpreadFire = !hasQuantumDisruptor && (player.spreadTimer > 0 || player.permanentChrono);
+  const isRedDualLaserShot = player.redDualLaser && !hasSpreadFire && !hasQuantumDisruptor;
+  const isDualMissileShot = player.dualMissile && !hasSpreadFire && !isRedDualLaserShot && !hasQuantumDisruptor;
   if (isDualMissileShot) {
     player.dualMissileShotCount += 1;
   }
 
-  const shots = hasSpreadFire
+  const shots = hasQuantumDisruptor
+    ? [
+        {
+          xOffset: 0,
+          vx: 0,
+          color: "#d7fff9",
+          damage: 5,
+          piercing: true,
+          radius: 8,
+          speed: 680,
+        },
+      ]
+    : hasSpreadFire
     ? [
         { xOffset: -9, vx: -175 },
         { xOffset: 0, vx: 0 },
@@ -864,23 +884,26 @@ function shootPlayer() {
       color: shot.color || "#ffd166",
       damage: shot.damage || 1,
       missile: shot.missile || false,
+      piercing: shot.piercing || false,
     });
   });
 
-  fireCooldown = hasSpreadFire || player.dualMissile || player.redDualLaser ? 0.14 : 0.18;
+  fireCooldown = hasQuantumDisruptor ? 0.11 : hasSpreadFire || player.dualMissile || player.redDualLaser ? 0.14 : 0.18;
   playHeroLaserSound(hasSpreadFire);
 }
 
 function spawnPowerUp(x, y, type = "chrono") {
-  const isBossReward = type === "dualMissile" || type === "dualMissilePlus" || type === "overShield" || type === "redDualLaser";
+  const isBossReward = type === "dualMissile" || type === "dualMissilePlus" || type === "overShield" || type === "redDualLaser" || type === "quantumDisruptor";
   powerUps.push({
     type,
     x,
     y,
-    radius: isBossReward ? 17 : 15,
-    speed: 95,
+    radius: type === "quantumDisruptor" ? 18 : isBossReward ? 17 : 15,
+    speed: type === "quantumDisruptor" ? 78 : 95,
     spin: Math.random() * Math.PI * 2,
-    drift: Math.random() > 0.5 ? 24 : -24,
+    drift: type === "quantumDisruptor"
+      ? (Math.random() > 0.5 ? 42 : -42)
+      : Math.random() > 0.5 ? 24 : -24,
   });
 }
 
@@ -903,6 +926,15 @@ function collectPowerUp(powerUp) {
     addExplosion(powerUp.x, powerUp.y, "#ff3b4f", 30, 4, 1.14);
     playTone(520, 0.16, "square", 0.04);
     playTone(780, 0.2, "square", 0.035);
+    return;
+  }
+
+  if (powerUp.type === "quantumDisruptor") {
+    player.quantumDisruptor = true;
+    player.quantumDamageTaken = 0;
+    addExplosion(powerUp.x, powerUp.y, "#d7fff9", 38, 5, 1.22);
+    playTone(420, 0.18, "sawtooth", 0.035);
+    playTone(1260, 0.24, "triangle", 0.045);
     return;
   }
 
@@ -970,6 +1002,13 @@ function hitPlayer(damage) {
     return;
   }
 
+  if (player.quantumDisruptor) {
+    player.quantumDamageTaken += damage;
+    if (player.quantumDamageTaken >= player.quantumDamageLimit) {
+      deactivateQuantumDisruptor();
+    }
+  }
+
   let remainingDamage = damage;
   if (player.overShield > 0) {
     const absorbedDamage = Math.min(player.overShield, remainingDamage);
@@ -985,6 +1024,17 @@ function hitPlayer(damage) {
   if (player.health <= 0) {
     endGame();
   }
+}
+
+function deactivateQuantumDisruptor() {
+  if (!player?.quantumDisruptor) {
+    return;
+  }
+
+  player.quantumDisruptor = false;
+  player.quantumDamageTaken = 0;
+  addExplosion(player.x, player.y, "#d7fff9", 24, 4, 1.05);
+  playTone(260, 0.18, "triangle", 0.035);
 }
 
 function endGame() {
@@ -1038,6 +1088,19 @@ function startNextWave() {
 
   enemiesRemaining = waveSize();
   spawnTimer = 1.25;
+  maybeSpawnQuantumDisruptor();
+}
+
+function maybeSpawnQuantumDisruptor() {
+  if (quantumDisruptorOffered || wave !== quantumDisruptorWave) {
+    return;
+  }
+
+  quantumDisruptorOffered = true;
+  const padding = 42;
+  const spawnX = padding + Math.random() * Math.max(1, width() - padding * 2);
+  spawnPowerUp(spawnX, -28, "quantumDisruptor");
+  showBossMessage("QUANTUM DISRUPTOR DETECTED", 1.8);
 }
 
 function startBossWave() {
@@ -1356,7 +1419,17 @@ function checkCollisions() {
       }
 
       if (distance(bullet, enemy) < bullet.radius + enemy.radius) {
-        bullet.y = -100;
+        if (bullet.piercing) {
+          if (!bullet.hitEnemies) {
+            bullet.hitEnemies = new WeakSet();
+          }
+          if (bullet.hitEnemies.has(enemy)) {
+            return;
+          }
+          bullet.hitEnemies.add(enemy);
+        } else {
+          bullet.y = -100;
+        }
         enemy.health -= bullet.damage || 1;
         addExplosion(bullet.x, bullet.y, enemy.accent);
         if (enemy.health <= 0) {
@@ -1369,7 +1442,14 @@ function checkCollisions() {
     });
 
     if (boss && bossMode === "active" && distance(bullet, boss) < bullet.radius + boss.radius) {
-      bullet.y = -100;
+      if (bullet.piercing) {
+        if (bullet.hitBoss) {
+          return;
+        }
+        bullet.hitBoss = true;
+      } else {
+        bullet.y = -100;
+      }
       damageBoss(bullet.missile ? 18 : (bullet.damage || 1) * 10);
       addExplosion(bullet.x, bullet.y, "#ff4f78");
     }
@@ -1583,6 +1663,10 @@ function drawPlayer() {
     return;
   }
 
+  if (player.quantumDisruptor) {
+    drawPlayerQuantumAura();
+  }
+
   if (player.overShield > 0) {
     drawPlayerOverShield();
   }
@@ -1592,6 +1676,28 @@ function drawPlayer() {
   }
 
   drawPlayerFallback();
+}
+
+function drawPlayerQuantumAura() {
+  const pulse = 1 + Math.sin(performance.now() / 95) * 0.07;
+
+  ctx.save();
+  ctx.translate(player.x, player.y);
+  ctx.globalCompositeOperation = "lighter";
+  ctx.globalAlpha = 0.34;
+  ctx.strokeStyle = "#d7fff9";
+  ctx.shadowBlur = 28;
+  ctx.shadowColor = "#d7fff9";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 39 * pulse, 43 * pulse, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.globalAlpha = 0.18;
+  ctx.fillStyle = "#8df7ff";
+  ctx.beginPath();
+  ctx.arc(0, 0, 32 * pulse, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
 }
 
 function drawPlayerOverShield() {
@@ -1734,6 +1840,8 @@ function drawPowerUp(powerUp) {
     drawDualMissilePowerUpFallback(powerUp.type === "redDualLaser");
   } else if (powerUp.type === "overShield") {
     drawOverShieldPowerUpFallback();
+  } else if (powerUp.type === "quantumDisruptor") {
+    drawQuantumDisruptorPowerUpFallback();
   } else if (!drawShipImage(shipImages.powerUp, 0, 0, 34, 34)) {
     drawPowerUpFallback();
   }
@@ -1812,6 +1920,32 @@ function drawOverShieldPowerUpFallback() {
   ctx.stroke();
 }
 
+function drawQuantumDisruptorPowerUpFallback() {
+  ctx.shadowBlur = 22;
+  ctx.shadowColor = "#d7fff9";
+  ctx.strokeStyle = "#d7fff9";
+  ctx.fillStyle = "rgba(141, 247, 255, 0.72)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, -19);
+  ctx.lineTo(11, -5);
+  ctx.lineTo(19, 0);
+  ctx.lineTo(11, 5);
+  ctx.lineTo(0, 19);
+  ctx.lineTo(-11, 5);
+  ctx.lineTo(-19, 0);
+  ctx.lineTo(-11, -5);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = "#07111d";
+  ctx.fillRect(-3, -13, 6, 26);
+  ctx.fillStyle = "#f5fbff";
+  ctx.fillRect(-11, -2, 22, 4);
+}
+
 function drawShipImage(asset, x, y, drawWidth, drawHeight) {
   if (!asset?.loaded || asset.failed) {
     return false;
@@ -1837,9 +1971,16 @@ function drawImageContain(asset, x, y, maxWidth, maxHeight) {
 
 function drawPlayerBullet(bullet) {
   ctx.fillStyle = bullet.color || "#ffd166";
-  ctx.shadowBlur = bullet.missile ? 18 : 12;
+  ctx.shadowBlur = bullet.piercing ? 24 : bullet.missile ? 18 : 12;
   ctx.shadowColor = bullet.color || "#ffd166";
-  if (bullet.missile) {
+  if (bullet.piercing) {
+    ctx.globalCompositeOperation = "lighter";
+    ctx.fillRect(bullet.x - bullet.radius / 2, bullet.y - 22, bullet.radius, 34);
+    ctx.globalAlpha = 0.42;
+    ctx.fillRect(bullet.x - bullet.radius, bullet.y - 28, bullet.radius * 2, 44);
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = "source-over";
+  } else if (bullet.missile) {
     ctx.beginPath();
     ctx.moveTo(bullet.x, bullet.y - 16);
     ctx.lineTo(bullet.x + bullet.radius, bullet.y + 10);
