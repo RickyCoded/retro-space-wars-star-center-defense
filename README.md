@@ -39,7 +39,7 @@ http://localhost:8000
 - Avoid enemy ships and enemy fire.
 - Collect Chrono Crystals to briefly unlock spread fire.
 - Only smaller heavy mini-boss ships can drop Chrono Crystals.
-- Chrono Crystal drops have a 55% chance from eligible heavy mini-boss ships, up to three per wave.
+- Chrono Crystal drops have a 55% chance from eligible heavy mini-boss ships, up to three per wave through Wave 20 and four per wave after Wave 20.
 - Defeated boss cruisers drop special boss rewards: Boss 1 drops dual missiles, Boss 2 drops dual missiles with every-fourth-shot missile fire, Boss 3 drops an over-shield, and Boss 4 drops stronger red dual lasers.
 - Chrono Crystals temporarily override the dual missile gun with spread fire, then revert back to dual missiles when the Chrono effect ends.
 - The over-shield makes the hero ship glow and absorbs 20 damage before normal shield takes damage again.
@@ -105,7 +105,8 @@ Chrono Crystal drops are controlled by the `maybeDropPowerUp()` function in `gam
 
 - Eligible drop source: smaller heavy mini-boss ships only
 - Drop chance: `0.55`, or 55%, when an eligible ship is destroyed
-- Drop cap: `3` Chrono Crystals per wave
+- Drop cap through Wave 20: `3` Chrono Crystals per wave
+- Drop cap after Wave 20: `4` Chrono Crystals per wave
 - Drop cap reset: every new wave
 - Pickup duration: `7` seconds of spread fire
 - Pickup image: `assets/images/powerUp.png`
