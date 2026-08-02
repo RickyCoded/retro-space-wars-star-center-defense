@@ -38,6 +38,7 @@ const VICTORY_CINEMATIC_SRC = "assets/video/victory-cinematic.mp4";
 const MUSIC_FILES = {
   title: "assets/audio/title-theme.mp3",
   gameOver: "assets/audio/game-over-theme.mp3",
+  victory: "assets/audio/victory-theme.mp3",
   gameplay: [
     "assets/audio/gameplay-theme.mp3",
     "assets/audio/gameplay-theme-2.mp3",
@@ -49,6 +50,7 @@ const MUSIC_VOLUME = {
   title: 0.45,
   gameplay: 0.35,
   gameOver: 0.4,
+  victory: 0.42,
 };
 
 const MUSIC_FADE_MS = 450;
@@ -199,6 +201,7 @@ const MAX_PARTICLES = isMobilePerformanceMode ? 120 : 240;
 const musicTracks = {
   title: createMusicTrack(MUSIC_FILES.title, MUSIC_VOLUME.title),
   gameOver: createMusicTrack(MUSIC_FILES.gameOver, MUSIC_VOLUME.gameOver),
+  victory: createMusicTrack(MUSIC_FILES.victory, MUSIC_VOLUME.victory),
   gameplay: createMusicTrack(MUSIC_FILES.gameplay[gameplayMusicIndex], MUSIC_VOLUME.gameplay),
 };
 
@@ -408,7 +411,9 @@ function beginMusic(trackName) {
   currentMusic = trackName;
   musicRequestId += 1;
   const requestId = musicRequestId;
-  track.audio.loop = trackName === "title" || (trackName === "gameplay" && MUSIC_FILES.gameplay.length < 2);
+  track.audio.loop = trackName === "title"
+    || trackName === "victory"
+    || (trackName === "gameplay" && MUSIC_FILES.gameplay.length < 2);
   track.audio.volume = 0;
 
   track.audio.play()
@@ -502,6 +507,21 @@ function stopGameOverMusic(onComplete) {
   stopMusic("gameOver", true, onComplete);
 }
 
+function playVictoryMusic() {
+  const track = musicTracks.victory;
+
+  if (!track.audio.paused) {
+    return;
+  }
+
+  track.audio.currentTime = 0;
+  beginMusic("victory");
+}
+
+function stopVictoryMusic(onComplete) {
+  stopMusic("victory", true, onComplete);
+}
+
 function pauseCurrentMusic() {
   if (!currentMusic) {
     return;
@@ -524,6 +544,9 @@ function resumeCurrentMusic() {
   } else if (gameState === "gameover") {
     currentMusic = "gameOver";
     beginMusic("gameOver");
+  } else if (gameState === "victory" || gameState === "cinematic") {
+    currentMusic = "victory";
+    beginMusic("victory");
   }
 }
 
@@ -633,7 +656,13 @@ function resetGame() {
   hideBossUi();
   updateTouchPauseButton();
   updateHud();
-  playGameplayMusic();
+  if (currentMusic === "victory") {
+    stopVictoryMusic(() => playGameplayMusic());
+  } else if (currentMusic === "gameOver") {
+    stopGameOverMusic(() => playGameplayMusic());
+  } else {
+    playGameplayMusic();
+  }
 }
 
 function waveSize() {
@@ -738,7 +767,13 @@ function returnToTitle() {
   victoryCinematic.load();
   pauseScreen.classList.add("hidden");
   hideBossUi();
-  stopGameplayMusic(() => playTitleMusic());
+  if (currentMusic === "victory") {
+    stopVictoryMusic(() => playTitleMusic());
+  } else if (currentMusic === "gameOver") {
+    stopGameOverMusic(() => playTitleMusic());
+  } else {
+    stopGameplayMusic(() => playTitleMusic());
+  }
   updateTouchPauseButton();
   updateHud();
 }
@@ -1084,6 +1119,7 @@ function playVictoryCinematic() {
   victoryCinematic.src = VICTORY_CINEMATIC_SRC;
   victoryCinematic.currentTime = 0;
   victoryCinematic.load();
+  playVictoryMusic();
 
   victoryCinematic.play().catch(() => {
     console.warn(`Victory cinematic could not be played: ${VICTORY_CINEMATIC_SRC}`);

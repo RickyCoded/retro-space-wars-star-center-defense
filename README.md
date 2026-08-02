@@ -160,14 +160,16 @@ Use these exact file names:
 - `gameplay-theme-2.mp3` - second gameplay music track, played after the first one ends
 - `gameplay-theme-3.mp3` - third gameplay music track, played after the second one ends
 - `game-over-theme.mp3` - short cue for the "Star Center Has Fallen" screen
+- `victory-theme.mp3` - looping victory music for the final cinematic and victory screen
 
-During gameplay, the first track plays, then the second track plays, then the third track plays, then the playlist repeats. The game-over cue plays once after gameplay music stops. To replace the songs, overwrite those files with new MP3s using the same names. To change the filenames later, edit the `MUSIC_FILES` values near the top of `game.js`.
+During gameplay, the first track plays, then the second track plays, then the third track plays, then the playlist repeats. The game-over cue plays once after gameplay music stops. The victory theme starts when the final cinematic begins and keeps looping on the victory screen until the player chooses **Play Again** or **Return to Title**. To replace the songs, overwrite those files with new MP3s using the same names. To change the filenames later, edit the `MUSIC_FILES` values near the top of `game.js`.
 
 To change music volume, edit the `MUSIC_VOLUME` values near the top of `game.js`:
 
 - Title music volume defaults to `0.45`
 - Gameplay music volume defaults to `0.35`
 - Game-over music volume defaults to `0.4`
+- Victory music volume defaults to `0.42`
 
 Browsers usually block music until the player interacts with the page. The game starts music only after an input such as clicking **Start Mission**, pressing a key, or using the music button.
 
@@ -206,7 +208,7 @@ Use this exact file name:
 
 - `victory-cinematic.mp4` - cinematic played after the final boss is defeated
 
-The cinematic plays once, then the victory screen appears with a flashing **Victory!** message. If the MP4 is missing or cannot play, the game skips directly to the victory screen. To change the filename later, edit the `VICTORY_CINEMATIC_SRC` value near the top of `game.js`.
+The cinematic plays once, then the victory screen appears with a flashing **Victory!** message. The `victory-theme.mp3` music continues across both screens. If the MP4 is missing or cannot play, the game skips directly to the victory screen. To change the filename later, edit the `VICTORY_CINEMATIC_SRC` value near the top of `game.js`.
 
 ## Project Files
 
