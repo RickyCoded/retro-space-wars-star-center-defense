@@ -31,6 +31,10 @@ http://localhost:8000
 - Pause or resume: P
 - Mobile: use the on-screen touch buttons. Tap fire once to enable auto-fire for the rest of that mission.
 
+## Mobile Performance
+
+The game automatically uses a lighter visual mode on touch devices. Mobile performance mode keeps gameplay, scoring, waves, and power-ups the same, but reduces canvas render scale, glow intensity, and particle counts so phones have less work to draw every frame.
+
 ## Gameplay
 
 - Defend Star Center from waves of Void Empire ships.

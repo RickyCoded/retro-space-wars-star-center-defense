@@ -193,6 +193,9 @@ let musicRequestId = 0;
 let gameplayMusicIndex = 0;
 let mobileAutoFireEnabled = false;
 
+const isMobilePerformanceMode = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+const MAX_PARTICLES = isMobilePerformanceMode ? 120 : 240;
+
 const musicTracks = {
   title: createMusicTrack(MUSIC_FILES.title, MUSIC_VOLUME.title),
   gameOver: createMusicTrack(MUSIC_FILES.gameOver, MUSIC_VOLUME.gameOver),
@@ -545,7 +548,7 @@ function toggleMute() {
 
 function resizeCanvas() {
   const rect = canvas.getBoundingClientRect();
-  const scale = window.devicePixelRatio || 1;
+  const scale = isMobilePerformanceMode ? Math.min(window.devicePixelRatio || 1, 1.35) : window.devicePixelRatio || 1;
   canvas.width = Math.floor(rect.width * scale);
   canvas.height = Math.floor(rect.height * scale);
   ctx.setTransform(scale, 0, 0, scale, 0, 0);
@@ -969,8 +972,17 @@ function shootEnemy(enemy) {
   playTone(220, 0.08, "sawtooth", 0.018);
 }
 
+function mobileCount(count) {
+  return isMobilePerformanceMode ? Math.max(4, Math.ceil(count * 0.45)) : count;
+}
+
+function mobileBlur(amount) {
+  return isMobilePerformanceMode ? Math.min(amount * 0.35, 6) : amount;
+}
+
 function addExplosion(x, y, color, count = 18, size = 3, speedBoost = 1) {
-  for (let i = 0; i < count; i += 1) {
+  const particleCount = mobileCount(count);
+  for (let i = 0; i < particleCount; i += 1) {
     const angle = Math.random() * Math.PI * 2;
     particles.push({
       x,
@@ -982,6 +994,10 @@ function addExplosion(x, y, color, count = 18, size = 3, speedBoost = 1) {
       color,
       size,
     });
+  }
+
+  if (particles.length > MAX_PARTICLES) {
+    particles.splice(0, particles.length - MAX_PARTICLES);
   }
 }
 
@@ -1683,20 +1699,24 @@ function drawPlayerQuantumAura() {
 
   ctx.save();
   ctx.translate(player.x, player.y);
-  ctx.globalCompositeOperation = "lighter";
-  ctx.globalAlpha = 0.34;
+  if (!isMobilePerformanceMode) {
+    ctx.globalCompositeOperation = "lighter";
+  }
+  ctx.globalAlpha = isMobilePerformanceMode ? 0.24 : 0.34;
   ctx.strokeStyle = "#d7fff9";
-  ctx.shadowBlur = 28;
+  ctx.shadowBlur = mobileBlur(28);
   ctx.shadowColor = "#d7fff9";
   ctx.lineWidth = 3;
   ctx.beginPath();
   ctx.ellipse(0, 0, 39 * pulse, 43 * pulse, 0, 0, Math.PI * 2);
   ctx.stroke();
-  ctx.globalAlpha = 0.18;
-  ctx.fillStyle = "#8df7ff";
-  ctx.beginPath();
-  ctx.arc(0, 0, 32 * pulse, 0, Math.PI * 2);
-  ctx.fill();
+  if (!isMobilePerformanceMode) {
+    ctx.globalAlpha = 0.18;
+    ctx.fillStyle = "#8df7ff";
+    ctx.beginPath();
+    ctx.arc(0, 0, 32 * pulse, 0, Math.PI * 2);
+    ctx.fill();
+  }
   ctx.restore();
 }
 
@@ -1708,8 +1728,8 @@ function drawPlayerOverShield() {
   ctx.translate(player.x, player.y);
   ctx.globalAlpha = 0.26 + shieldRatio * 0.22;
   ctx.strokeStyle = "#7dffb2";
-  ctx.fillStyle = "rgba(125, 255, 178, 0.1)";
-  ctx.shadowBlur = 22;
+  ctx.fillStyle = isMobilePerformanceMode ? "rgba(125, 255, 178, 0.04)" : "rgba(125, 255, 178, 0.1)";
+  ctx.shadowBlur = mobileBlur(22);
   ctx.shadowColor = "#7dffb2";
   ctx.lineWidth = 2;
   ctx.beginPath();
@@ -1785,16 +1805,18 @@ function drawBoss() {
   ctx.translate(boss.x + shakeX, boss.y + shakeY);
 
   if (isDefeated) {
-    const glow = ctx.createRadialGradient(0, 0, boss.width * 0.1, 0, 0, boss.width * 0.72);
-    glow.addColorStop(0, "rgba(255, 209, 102, 0.55)");
-    glow.addColorStop(0.45, "rgba(255, 79, 120, 0.28)");
-    glow.addColorStop(1, "rgba(255, 79, 120, 0)");
-    ctx.globalCompositeOperation = "lighter";
-    ctx.fillStyle = glow;
-    ctx.beginPath();
-    ctx.arc(0, 0, boss.width * 0.72, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalCompositeOperation = "source-over";
+    if (!isMobilePerformanceMode) {
+      const glow = ctx.createRadialGradient(0, 0, boss.width * 0.1, 0, 0, boss.width * 0.72);
+      glow.addColorStop(0, "rgba(255, 209, 102, 0.55)");
+      glow.addColorStop(0.45, "rgba(255, 79, 120, 0.28)");
+      glow.addColorStop(1, "rgba(255, 79, 120, 0)");
+      ctx.globalCompositeOperation = "lighter";
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(0, 0, boss.width * 0.72, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalCompositeOperation = "source-over";
+    }
     ctx.globalAlpha = boss.opacity ?? 1;
   } else if (boss.hitFlash > 0 || (boss.phase > 1 && Math.floor(boss.pulseTimer * 8) % 2 === 0)) {
     ctx.globalAlpha = boss.hitFlash > 0 ? 0.72 : 0.9;
@@ -1850,7 +1872,7 @@ function drawPowerUp(powerUp) {
 }
 
 function drawPowerUpFallback() {
-  ctx.shadowBlur = 14;
+  ctx.shadowBlur = mobileBlur(14);
   ctx.shadowColor = "#8df7ff";
   ctx.fillStyle = "#8df7ff";
   ctx.strokeStyle = "#ffd166";
@@ -1870,7 +1892,7 @@ function drawPowerUpFallback() {
 }
 
 function drawDualMissilePowerUpFallback(isRedUpgrade = false) {
-  ctx.shadowBlur = 16;
+  ctx.shadowBlur = mobileBlur(16);
   ctx.shadowColor = isRedUpgrade ? "#ff3b4f" : "#ffd166";
   ctx.fillStyle = isRedUpgrade ? "#ff3b4f" : "#ffd166";
   ctx.strokeStyle = isRedUpgrade ? "#ffd166" : "#8df7ff";
@@ -1896,7 +1918,7 @@ function drawDualMissilePowerUpFallback(isRedUpgrade = false) {
 }
 
 function drawOverShieldPowerUpFallback() {
-  ctx.shadowBlur = 18;
+  ctx.shadowBlur = mobileBlur(18);
   ctx.shadowColor = "#7dffb2";
   ctx.fillStyle = "rgba(125, 255, 178, 0.78)";
   ctx.strokeStyle = "#f5fbff";
@@ -1921,7 +1943,7 @@ function drawOverShieldPowerUpFallback() {
 }
 
 function drawQuantumDisruptorPowerUpFallback() {
-  ctx.shadowBlur = 22;
+  ctx.shadowBlur = mobileBlur(22);
   ctx.shadowColor = "#d7fff9";
   ctx.strokeStyle = "#d7fff9";
   ctx.fillStyle = "rgba(141, 247, 255, 0.72)";
@@ -1971,15 +1993,19 @@ function drawImageContain(asset, x, y, maxWidth, maxHeight) {
 
 function drawPlayerBullet(bullet) {
   ctx.fillStyle = bullet.color || "#ffd166";
-  ctx.shadowBlur = bullet.piercing ? 24 : bullet.missile ? 18 : 12;
+  ctx.shadowBlur = mobileBlur(bullet.piercing ? 24 : bullet.missile ? 18 : 12);
   ctx.shadowColor = bullet.color || "#ffd166";
   if (bullet.piercing) {
-    ctx.globalCompositeOperation = "lighter";
+    if (!isMobilePerformanceMode) {
+      ctx.globalCompositeOperation = "lighter";
+    }
     ctx.fillRect(bullet.x - bullet.radius / 2, bullet.y - 22, bullet.radius, 34);
-    ctx.globalAlpha = 0.42;
-    ctx.fillRect(bullet.x - bullet.radius, bullet.y - 28, bullet.radius * 2, 44);
-    ctx.globalAlpha = 1;
-    ctx.globalCompositeOperation = "source-over";
+    if (!isMobilePerformanceMode) {
+      ctx.globalAlpha = 0.42;
+      ctx.fillRect(bullet.x - bullet.radius, bullet.y - 28, bullet.radius * 2, 44);
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = "source-over";
+    }
   } else if (bullet.missile) {
     ctx.beginPath();
     ctx.moveTo(bullet.x, bullet.y - 16);
@@ -1996,7 +2022,7 @@ function drawPlayerBullet(bullet) {
 
 function drawEnemyBullet(bullet) {
   ctx.fillStyle = bullet.color || "#ff4f78";
-  ctx.shadowBlur = 10;
+  ctx.shadowBlur = mobileBlur(10);
   ctx.shadowColor = bullet.color || "#ff4f78";
   ctx.beginPath();
   ctx.arc(bullet.x, bullet.y, bullet.radius, 0, Math.PI * 2);
