@@ -175,7 +175,9 @@ Browsers usually block music until the player interacts with the page. The game 
 
 ## Adding Sound Effects
 
-Place custom sound-effect MP3 files in:
+The game currently uses the lightweight generated default sound effects for lasers and explosions. This avoids repeated short MP3 playback, which can cause lag on some mobile browsers.
+
+To re-enable custom sound-effect MP3 files later, set `USE_CUSTOM_SOUND_EFFECT_MP3S` near the top of `game.js` to `true`, then place the custom MP3 files in:
 
 ```text
 assets/audio/
@@ -187,7 +189,7 @@ Use this exact file name:
 - `enemy-destroyed.mp3` - played when a normal enemy ship is destroyed
 - `hero-laser.mp3` - played when the Alliance starfighter fires
 
-If an MP3 is missing or cannot play, the game uses the original simple sound effect. To change filenames or volumes later, edit the `SOUND_EFFECT_FILES` and `SOUND_EFFECT_VOLUMES` values near the top of `game.js`.
+If custom MP3 sound effects are enabled and an MP3 is missing or cannot play, the game uses the original simple sound effect. To change filenames or volumes later, edit the `SOUND_EFFECT_FILES` and `SOUND_EFFECT_VOLUMES` values near the top of `game.js`.
 
 Current sound-effect volume settings:
 

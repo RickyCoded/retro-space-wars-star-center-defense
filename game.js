@@ -56,6 +56,9 @@ const MUSIC_VOLUME = {
 const MUSIC_FADE_MS = 450;
 const SOUND_EFFECT_VOLUME = 0.42;
 
+// Keep custom MP3 sound effects off on mobile/testing builds for smoother gameplay.
+const USE_CUSTOM_SOUND_EFFECT_MP3S = false;
+
 const SOUND_EFFECT_FILES = {
   bossDestroyed: "assets/audio/boss-destroyed.mp3",
   enemyDestroyed: "assets/audio/enemy-destroyed.mp3",
@@ -207,11 +210,13 @@ const musicTracks = {
   gameplay: createMusicTrack(MUSIC_FILES.gameplay[gameplayMusicIndex], MUSIC_VOLUME.gameplay),
 };
 
-const soundEffects = {
-  bossDestroyed: createSoundEffect(SOUND_EFFECT_FILES.bossDestroyed, SOUND_EFFECT_VOLUMES.bossDestroyed, 3),
-  enemyDestroyed: createSoundEffect(SOUND_EFFECT_FILES.enemyDestroyed, SOUND_EFFECT_VOLUMES.enemyDestroyed),
-  heroLaser: createSoundEffect(SOUND_EFFECT_FILES.heroLaser, SOUND_EFFECT_VOLUMES.heroLaser, 8),
-};
+const soundEffects = USE_CUSTOM_SOUND_EFFECT_MP3S
+  ? {
+    bossDestroyed: createSoundEffect(SOUND_EFFECT_FILES.bossDestroyed, SOUND_EFFECT_VOLUMES.bossDestroyed, 3),
+    enemyDestroyed: createSoundEffect(SOUND_EFFECT_FILES.enemyDestroyed, SOUND_EFFECT_VOLUMES.enemyDestroyed),
+    heroLaser: createSoundEffect(SOUND_EFFECT_FILES.heroLaser, SOUND_EFFECT_VOLUMES.heroLaser, 8),
+  }
+  : {};
 
 function loadShipImage(src) {
   const asset = {
