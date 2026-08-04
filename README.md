@@ -197,6 +197,9 @@ Current sound-effect volume settings:
 - Enemy destroyed MP3 volume defaults to `0.18`
 - Hero laser MP3 volume defaults to `0.13`
 - Generated fallback sound-effect multiplier defaults to `0.42`
+- Generated boss destroyed tone gain defaults to `0.18`
+- Generated enemy destroyed tone gain defaults to `0.12`
+- Generated hero laser tone gain defaults to `0.09`
 
 ## Adding The Victory Cinematic
 

@@ -71,6 +71,12 @@ const SOUND_EFFECT_VOLUMES = {
   heroLaser: 0.13,
 };
 
+const DEFAULT_SOUND_TONE_GAINS = {
+  bossDestroyed: 0.18,
+  enemyDestroyed: 0.12,
+  heroLaser: 0.09,
+};
+
 const keys = {
   left: false,
   right: false,
@@ -301,15 +307,15 @@ function playSoundEffect(name, fallback) {
 }
 
 function playEnemyDestroyedSound() {
-  playSoundEffect("enemyDestroyed", () => playTone(360, 0.09, "square", 0.035));
+  playSoundEffect("enemyDestroyed", () => playTone(360, 0.09, "square", DEFAULT_SOUND_TONE_GAINS.enemyDestroyed));
 }
 
 function playHeroLaserSound(hasSpreadFire) {
-  playSoundEffect("heroLaser", () => playTone(hasSpreadFire ? 900 : 760, 0.06, "square", 0.025));
+  playSoundEffect("heroLaser", () => playTone(hasSpreadFire ? 900 : 760, 0.06, "square", DEFAULT_SOUND_TONE_GAINS.heroLaser));
 }
 
 function playBossDestroyedSound() {
-  playSoundEffect("bossDestroyed", () => playTone(70, 0.35, "sawtooth", 0.045));
+  playSoundEffect("bossDestroyed", () => playTone(70, 0.35, "sawtooth", DEFAULT_SOUND_TONE_GAINS.bossDestroyed));
 }
 
 function getGameplayMusicSrc() {
