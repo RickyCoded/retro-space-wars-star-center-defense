@@ -196,7 +196,9 @@ let gameplayMusicIndex = 0;
 let mobileAutoFireEnabled = false;
 
 const isMobilePerformanceMode = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-const MAX_PARTICLES = isMobilePerformanceMode ? 120 : 240;
+const MAX_PARTICLES = isMobilePerformanceMode ? 70 : 240;
+const STAR_COUNT = isMobilePerformanceMode ? 55 : 100;
+const MOBILE_CANVAS_SCALE = 1;
 
 const musicTracks = {
   title: createMusicTrack(MUSIC_FILES.title, MUSIC_VOLUME.title),
@@ -571,7 +573,7 @@ function toggleMute() {
 
 function resizeCanvas() {
   const rect = canvas.getBoundingClientRect();
-  const scale = isMobilePerformanceMode ? Math.min(window.devicePixelRatio || 1, 1.35) : window.devicePixelRatio || 1;
+  const scale = isMobilePerformanceMode ? MOBILE_CANVAS_SCALE : window.devicePixelRatio || 1;
   canvas.width = Math.floor(rect.width * scale);
   canvas.height = Math.floor(rect.height * scale);
   ctx.setTransform(scale, 0, 0, scale, 0, 0);
@@ -586,7 +588,7 @@ function height() {
 }
 
 function makeStars() {
-  stars = Array.from({ length: 100 }, () => ({
+  stars = Array.from({ length: STAR_COUNT }, () => ({
     x: Math.random() * width(),
     y: Math.random() * height(),
     size: Math.random() * 1.8 + 0.4,
@@ -1008,11 +1010,11 @@ function shootEnemy(enemy) {
 }
 
 function mobileCount(count) {
-  return isMobilePerformanceMode ? Math.max(4, Math.ceil(count * 0.45)) : count;
+  return isMobilePerformanceMode ? Math.max(3, Math.ceil(count * 0.3)) : count;
 }
 
 function mobileBlur(amount) {
-  return isMobilePerformanceMode ? Math.min(amount * 0.35, 6) : amount;
+  return isMobilePerformanceMode ? 0 : amount;
 }
 
 function addExplosion(x, y, color, count = 18, size = 3, speedBoost = 1) {

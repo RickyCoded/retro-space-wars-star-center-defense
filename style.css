@@ -578,7 +578,22 @@ canvas {
 
 @media (hover: none) and (pointer: coarse) {
   .stage-wrap {
+    box-shadow: none;
     margin-bottom: 84px;
+  }
+
+  button,
+  .music-toggle {
+    box-shadow: none;
+  }
+
+  .brand-logo,
+  .victory-flash {
+    filter: none;
+  }
+
+  .boss-health-fill {
+    box-shadow: none;
   }
 
   .touch-controls {
