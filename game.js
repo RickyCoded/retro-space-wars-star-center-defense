@@ -58,13 +58,13 @@ const SOUND_EFFECT_VOLUME = 0.42;
 
 // Enable custom sound effects one at a time so mobile stays smooth.
 const USE_CUSTOM_SOUND_EFFECTS = {
-  bossDestroyed: false,
+  bossDestroyed: true,
   enemyDestroyed: true,
   heroLaser: true,
 };
 
 const SOUND_EFFECT_FILES = {
-  bossDestroyed: "assets/audio/boss-destroyed.mp3",
+  bossDestroyed: "assets/audio/boss-destroyed.wav",
   enemyDestroyed: "assets/audio/enemy-destroyed.wav",
   heroLaser: "assets/audio/hero-laser.wav",
 };
