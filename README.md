@@ -175,7 +175,7 @@ Browsers usually block music until the player interacts with the page. The game 
 
 ## Adding Sound Effects
 
-The game currently uses a custom WAV file for the hero laser and lightweight generated default sound effects for explosions. This avoids repeated short MP3 playback, which can cause lag on some mobile browsers.
+The game currently uses custom WAV files for the hero laser and normal enemy destruction, plus a lightweight generated default sound effect for boss destruction. This avoids repeated short MP3 playback, which can cause lag on some mobile browsers.
 
 To enable or disable custom sound-effect files later, edit the `USE_CUSTOM_SOUND_EFFECTS` values near the top of `game.js`, then place the custom files in:
 
@@ -186,8 +186,8 @@ assets/audio/
 Current custom sound-effect file names:
 
 - `hero-laser.wav` - played when the Alliance starfighter fires
+- `enemy-destroyed.wav` - played when a normal enemy ship is destroyed
 - `boss-destroyed.mp3` - optional custom sound for large boss cruiser destruction
-- `enemy-destroyed.mp3` - optional custom sound for normal enemy ship destruction
 
 For short effects, WAV files are recommended over MP3 files for smoother mobile playback. If a custom sound effect is enabled and the file is missing or cannot play, the game uses the original simple sound effect. To change filenames or volumes later, edit the `SOUND_EFFECT_FILES` and `SOUND_EFFECT_VOLUMES` values near the top of `game.js`.
 
