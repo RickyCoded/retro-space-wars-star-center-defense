@@ -171,7 +171,7 @@ To change music volume, edit the `MUSIC_VOLUME` values near the top of `game.js`
 - Game-over music volume defaults to `0.4`
 - Victory music volume defaults to `0.42`
 
-Browsers usually block music until the player interacts with the page. The game starts music only after an input such as clicking **Start Mission**, pressing a key, or using the music button.
+Browsers usually block audio until the player interacts with the page. The game starts audio only after an input such as clicking **Start Mission**, pressing a key, or using the sound button. The sound button mutes both music and sound effects.
 
 ## Adding Sound Effects
 

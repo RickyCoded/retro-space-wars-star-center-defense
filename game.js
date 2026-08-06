@@ -297,6 +297,10 @@ function createSoundEffect(src, volume, poolSize = 5) {
 function playSoundEffect(name, fallback) {
   const effect = soundEffects[name];
 
+  if (musicMuted) {
+    return;
+  }
+
   if (!musicUnlocked || !effect || effect.failed) {
     fallback?.();
     return;
@@ -386,7 +390,7 @@ function saveHighScore() {
 // The music helpers keep one reusable audio element per song so repeated clicks
 // cannot stack overlapping copies of the same track.
 function updateMusicButton() {
-  musicToggle.textContent = musicMuted ? "Music Off" : "Music On";
+  musicToggle.textContent = musicMuted ? "Sound Off" : "Sound On";
   musicToggle.setAttribute("aria-pressed", String(musicMuted));
 }
 
@@ -583,6 +587,12 @@ function toggleMute() {
       track.fadeTimer = null;
       track.audio.pause();
       track.audio.volume = 0;
+    });
+    Object.values(soundEffects).forEach((effect) => {
+      effect?.pool.forEach((audio) => {
+        audio.pause();
+        audio.currentTime = 0;
+      });
     });
     return;
   }
@@ -800,7 +810,7 @@ function returnToTitle() {
 }
 
 function playTone(frequency, duration, type = "square", gain = 0.035) {
-  if (!audioContext) {
+  if (!audioContext || musicMuted) {
     return;
   }
 
